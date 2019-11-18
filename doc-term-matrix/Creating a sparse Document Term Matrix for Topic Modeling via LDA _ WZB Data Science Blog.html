@@ -1,0 +1,652 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0109)https://datascience.blog.wzb.eu/2016/06/17/creating-a-sparse-document-term-matrix-for-topic-modeling-via-lda/ -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US"><script>(function main() {
+    // Create enabled event
+    function fireEnabledEvent() {
+        // If gli exists, then we are already present and shouldn't do anything
+        if (!window.gli) {
+            setTimeout(function () {
+                var enabledEvent = document.createEvent("Event");
+                enabledEvent.initEvent("WebGLEnabledEvent", true, true);
+                document.dispatchEvent(enabledEvent);
+            }, 0);
+        } else {
+            //console.log("WebGL Inspector already embedded on the page - disabling extension");
+        }
+    };
+
+    // Grab the path root from the extension
+    document.addEventListener("WebGLInspectorReadyEvent", function (e) {
+        var pathElement = document.getElementById("__webglpathroot");
+        if (window["gliloader"]) {
+            gliloader.pathRoot = pathElement.innerText;
+        } else {
+            // TODO: more?
+            window.gliCssUrl = pathElement.innerText + "gli.all.css";
+        }
+    }, false);
+
+    // Rewrite getContext to snoop for webgl
+    var originalGetContext = HTMLCanvasElement.prototype.getContext;
+    if (!HTMLCanvasElement.prototype.getContextRaw) {
+        HTMLCanvasElement.prototype.getContextRaw = originalGetContext;
+    }
+    HTMLCanvasElement.prototype.getContext = function () {
+        var ignoreCanvas = this.internalInspectorSurface;
+        if (ignoreCanvas) {
+            return originalGetContext.apply(this, arguments);
+        }
+
+        var result = originalGetContext.apply(this, arguments);
+        if (result == null) {
+            return null;
+        }
+
+        var contextNames = ["moz-webgl", "webkit-3d", "experimental-webgl", "webgl", "3d"];
+        var requestingWebGL = contextNames.indexOf(arguments[0]) != -1;
+        if (requestingWebGL) {
+            // Page is requesting a WebGL context!
+            fireEnabledEvent(this);
+
+            // If we are injected, inspect this context
+            if (window.gli) {
+                if (gli.host.inspectContext) {
+                    // TODO: pull options from extension
+                    result = gli.host.inspectContext(this, result);
+                    // NOTE: execute in a timeout so that if the dom is not yet
+                    // loaded this won't error out.
+                    window.setTimeout(function() {
+                        var hostUI = new gli.host.HostUI(result);
+                        result.hostUI = hostUI; // just so we can access it later for debugging
+                    }, 0);
+                }
+            }
+        }
+
+        return result;
+    };
+})();</script><head profile="http://gmpg.org/xfn/11"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Creating a sparse Document Term Matrix for Topic Modeling via LDA | WZB Data Science Blog</title>
+<link rel="stylesheet" href="./Creating a sparse Document Term Matrix for Topic Modeling via LDA _ WZB Data Science Blog_files/style.css" type="text/css" media="all">
+<link rel="pingback" href="https://datascience.blog.wzb.eu/xmlrpc.php">
+<link rel="dns-prefetch" href="https://s0.wp.com/">
+<link rel="dns-prefetch" href="https://fonts.googleapis.com/">
+<link rel="dns-prefetch" href="https://s.w.org/">
+<link rel="alternate" type="application/rss+xml" title="WZB Data Science Blog » Feed" href="https://datascience.blog.wzb.eu/feed/">
+<link rel="alternate" type="application/rss+xml" title="WZB Data Science Blog » Comments Feed" href="https://datascience.blog.wzb.eu/comments/feed/">
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/12.0.0-1\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/12.0.0-1\/svg\/","svgExt":".svg","source":{"wpemoji":"https:\/\/datascience.blog.wzb.eu\/wp-includes\/js\/wp-emoji.js?ver=5.2.4","twemoji":"https:\/\/datascience.blog.wzb.eu\/wp-includes\/js\/twemoji.js?ver=5.2.4"}};
+			/**
+ * @output wp-includes/js/wp-emoji-loader.js
+ */
+
+( function( window, document, settings ) {
+	var src, ready, ii, tests;
+
+	// Create a canvas element for testing native browser support of emoji.
+	var canvas = document.createElement( 'canvas' );
+	var context = canvas.getContext && canvas.getContext( '2d' );
+
+	/**
+	 * Checks if two sets of Emoji characters render the same visually.
+	 *
+	 * @since 4.9.0
+	 *
+	 * @private
+	 *
+	 * @param {number[]} set1 Set of Emoji character codes.
+	 * @param {number[]} set2 Set of Emoji character codes.
+	 *
+	 * @return {boolean} True if the two sets render the same.
+	 */
+	function emojiSetsRenderIdentically( set1, set2 ) {
+		var stringFromCharCode = String.fromCharCode;
+
+		// Cleanup from previous test.
+		context.clearRect( 0, 0, canvas.width, canvas.height );
+		context.fillText( stringFromCharCode.apply( this, set1 ), 0, 0 );
+		var rendered1 = canvas.toDataURL();
+
+		// Cleanup from previous test.
+		context.clearRect( 0, 0, canvas.width, canvas.height );
+		context.fillText( stringFromCharCode.apply( this, set2 ), 0, 0 );
+		var rendered2 = canvas.toDataURL();
+
+		return rendered1 === rendered2;
+	}
+
+	/**
+	 * Detects if the browser supports rendering emoji or flag emoji.
+	 *
+	 * Flag emoji are a single glyph made of two characters, so some browsers
+	 * (notably, Firefox OS X) don't support them.
+	 *
+	 * @since 4.2.0
+	 *
+	 * @private
+	 *
+	 * @param {string} type Whether to test for support of "flag" or "emoji".
+	 *
+	 * @return {boolean} True if the browser can render emoji, false if it cannot.
+	 */
+	function browserSupportsEmoji( type ) {
+		var isIdentical;
+
+		if ( ! context || ! context.fillText ) {
+			return false;
+		}
+
+		/*
+		 * Chrome on OS X added native emoji rendering in M41. Unfortunately,
+		 * it doesn't work when the font is bolder than 500 weight. So, we
+		 * check for bold rendering support to avoid invisible emoji in Chrome.
+		 */
+		context.textBaseline = 'top';
+		context.font = '600 32px Arial';
+
+		switch ( type ) {
+			case 'flag':
+				/*
+				 * Test for UN flag compatibility. This is the least supported of the letter locale flags,
+				 * so gives us an easy test for full support.
+				 *
+				 * To test for support, we try to render it, and compare the rendering to how it would look if
+				 * the browser doesn't render it correctly ([U] + [N]).
+				 */
+				isIdentical = emojiSetsRenderIdentically(
+					[ 0xD83C, 0xDDFA, 0xD83C, 0xDDF3 ],
+					[ 0xD83C, 0xDDFA, 0x200B, 0xD83C, 0xDDF3 ]
+				);
+
+				if ( isIdentical ) {
+					return false;
+				}
+
+				/*
+				 * Test for English flag compatibility. England is a country in the United Kingdom, it
+				 * does not have a two letter locale code but rather an five letter sub-division code.
+				 *
+				 * To test for support, we try to render it, and compare the rendering to how it would look if
+				 * the browser doesn't render it correctly (black flag emoji + [G] + [B] + [E] + [N] + [G]).
+				 */
+				isIdentical = emojiSetsRenderIdentically(
+					[ 0xD83C, 0xDFF4, 0xDB40, 0xDC67, 0xDB40, 0xDC62, 0xDB40, 0xDC65, 0xDB40, 0xDC6E, 0xDB40, 0xDC67, 0xDB40, 0xDC7F ],
+					[ 0xD83C, 0xDFF4, 0x200B, 0xDB40, 0xDC67, 0x200B, 0xDB40, 0xDC62, 0x200B, 0xDB40, 0xDC65, 0x200B, 0xDB40, 0xDC6E, 0x200B, 0xDB40, 0xDC67, 0x200B, 0xDB40, 0xDC7F ]
+				);
+
+				return ! isIdentical;
+			case 'emoji':
+				/*
+				 * Love is love.
+				 *
+				 * To test for Emoji 12 support, try to render a new emoji: men holding hands, with different skin
+				 * tone modifiers.
+				 *
+				 * When updating this test for future Emoji releases, ensure that individual emoji that make up the
+				 * sequence come from older emoji standards.
+				 */
+				isIdentical = emojiSetsRenderIdentically(
+					[0xD83D, 0xDC68, 0xD83C, 0xDFFE, 0x200D, 0xD83E, 0xDD1D, 0x200D, 0xD83D, 0xDC68, 0xD83C, 0xDFFC],
+					[0xD83D, 0xDC68, 0xD83C, 0xDFFE, 0x200B, 0xD83E, 0xDD1D, 0x200B, 0xD83D, 0xDC68, 0xD83C, 0xDFFC]
+				);
+
+				return ! isIdentical;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Adds a script to the head of the document.
+	 *
+	 * @ignore
+	 *
+	 * @since 4.2.0
+	 *
+	 * @param {Object} src The url where the script is located.
+	 * @return {void}
+	 */
+	function addScript( src ) {
+		var script = document.createElement( 'script' );
+
+		script.src = src;
+		script.defer = script.type = 'text/javascript';
+		document.getElementsByTagName( 'head' )[0].appendChild( script );
+	}
+
+	tests = Array( 'flag', 'emoji' );
+
+	settings.supports = {
+		everything: true,
+		everythingExceptFlag: true
+	};
+
+	/*
+	 * Tests the browser support for flag emojis and other emojis, and adjusts the
+	 * support settings accordingly.
+	 */
+	for( ii = 0; ii < tests.length; ii++ ) {
+		settings.supports[ tests[ ii ] ] = browserSupportsEmoji( tests[ ii ] );
+
+		settings.supports.everything = settings.supports.everything && settings.supports[ tests[ ii ] ];
+
+		if ( 'flag' !== tests[ ii ] ) {
+			settings.supports.everythingExceptFlag = settings.supports.everythingExceptFlag && settings.supports[ tests[ ii ] ];
+		}
+	}
+
+	settings.supports.everythingExceptFlag = settings.supports.everythingExceptFlag && ! settings.supports.flag;
+
+	// Sets DOMReady to false and assigns a ready function to settings.
+	settings.DOMReady = false;
+	settings.readyCallback = function() {
+		settings.DOMReady = true;
+	};
+
+	// When the browser can not render everything we need to load a polyfill.
+	if ( ! settings.supports.everything ) {
+		ready = function() {
+			settings.readyCallback();
+		};
+
+		/*
+		 * Cross-browser version of adding a dom ready event.
+		 */
+		if ( document.addEventListener ) {
+			document.addEventListener( 'DOMContentLoaded', ready, false );
+			window.addEventListener( 'load', ready, false );
+		} else {
+			window.attachEvent( 'onload', ready );
+			document.attachEvent( 'onreadystatechange', function() {
+				if ( 'complete' === document.readyState ) {
+					settings.readyCallback();
+				}
+			} );
+		}
+
+		src = settings.source || {};
+
+		if ( src.concatemoji ) {
+			addScript( src.concatemoji );
+		} else if ( src.wpemoji && src.twemoji ) {
+			addScript( src.twemoji );
+			addScript( src.wpemoji );
+		}
+	}
+
+} )( window, document, window._wpemojiSettings );
+		</script><script src="./Creating a sparse Document Term Matrix for Topic Modeling via LDA _ WZB Data Science Blog_files/twemoji.js.download" type="text/javascript" defer=""></script><script src="./Creating a sparse Document Term Matrix for Topic Modeling via LDA _ WZB Data Science Blog_files/wp-emoji.js.download" type="text/javascript" defer=""></script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+	<link rel="stylesheet" id="wp-block-library-css" href="./Creating a sparse Document Term Matrix for Topic Modeling via LDA _ WZB Data Science Blog_files/style(1).css" type="text/css" media="all">
+<link rel="stylesheet" id="vortex-css-960-css" href="./Creating a sparse Document Term Matrix for Topic Modeling via LDA _ WZB Data Science Blog_files/960.css" type="text/css" media="all">
+<link rel="stylesheet" id="vortex-google-fonts-css" href="./Creating a sparse Document Term Matrix for Topic Modeling via LDA _ WZB Data Science Blog_files/css" type="text/css" media="all">
+<link rel="stylesheet" id="highlight-css" href="./Creating a sparse Document Term Matrix for Topic Modeling via LDA _ WZB Data Science Blog_files/github.css" type="text/css" media="all">
+<script type="text/javascript" src="./Creating a sparse Document Term Matrix for Topic Modeling via LDA _ WZB Data Science Blog_files/jquery.js.download"></script>
+<script type="text/javascript" src="./Creating a sparse Document Term Matrix for Topic Modeling via LDA _ WZB Data Science Blog_files/jquery-migrate.js.download"></script>
+<script type="text/javascript" src="./Creating a sparse Document Term Matrix for Topic Modeling via LDA _ WZB Data Science Blog_files/highlight.min.js.download"></script>
+<script type="text/javascript" src="./Creating a sparse Document Term Matrix for Topic Modeling via LDA _ WZB Data Science Blog_files/init_highlight.js.download"></script>
+<link rel="https://api.w.org/" href="https://datascience.blog.wzb.eu/wp-json/">
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://datascience.blog.wzb.eu/xmlrpc.php?rsd">
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://datascience.blog.wzb.eu/wp-includes/wlwmanifest.xml"> 
+<link rel="prev" title="About the WZB Data Science Blog" href="https://datascience.blog.wzb.eu/2016/06/14/welcome-to-the-wzb-data-science-blog/">
+<link rel="next" title="Linkdump #1" href="https://datascience.blog.wzb.eu/2016/06/17/linkdump-1/">
+<meta name="generator" content="WordPress 5.2.4">
+<link rel="canonical" href="https://datascience.blog.wzb.eu/2016/06/17/creating-a-sparse-document-term-matrix-for-topic-modeling-via-lda/">
+<link rel="shortlink" href="https://wp.me/p8axB6-u">
+<link rel="alternate" type="application/json+oembed" href="https://datascience.blog.wzb.eu/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fdatascience.blog.wzb.eu%2F2016%2F06%2F17%2Fcreating-a-sparse-document-term-matrix-for-topic-modeling-via-lda%2F">
+<link rel="alternate" type="text/xml+oembed" href="https://datascience.blog.wzb.eu/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fdatascience.blog.wzb.eu%2F2016%2F06%2F17%2Fcreating-a-sparse-document-term-matrix-for-topic-modeling-via-lda%2F&amp;format=xml">
+
+<link rel="dns-prefetch" href="https://v0.wordpress.com/">
+<style type="text/css">img#wpstats{display:none}</style>		<style type="text/css">.recentcomments a{display:inline !important;padding:0 !important;margin:0 !important;}</style>
+		
+<!-- Jetpack Open Graph Tags -->
+<meta property="og:type" content="article">
+<meta property="og:title" content="Creating a sparse Document Term Matrix for Topic Modeling via LDA">
+<meta property="og:url" content="https://datascience.blog.wzb.eu/2016/06/17/creating-a-sparse-document-term-matrix-for-topic-modeling-via-lda/">
+<meta property="og:description" content="To do topic modeling with methods like Latent Dirichlet Allocation, it is necessary to build a Document Term Matrix (DTM) that contains the number of term occurrences per document. The rows of the …">
+<meta property="article:published_time" content="2016-06-17T09:23:50+00:00">
+<meta property="article:modified_time" content="2016-12-02T09:04:14+00:00">
+<meta property="og:site_name" content="WZB Data Science Blog">
+<meta property="og:image" content="https://s0.wp.com/i/blank.jpg">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:text:title" content="Creating a sparse Document Term Matrix for Topic Modeling via LDA">
+<meta name="twitter:card" content="summary">
+
+<!-- End Jetpack Open Graph Tags -->
+			<style type="text/css" id="wp-custom-css">
+				code, kbd {
+	color: black;
+	font-family: Andale Mono, monospace;
+}
+
+pre {
+	padding: 2px 5px;
+}			</style>
+		</head>
+<body class="post-template-default single single-post postid-30 single-format-standard">
+<div class="wrapper">  
+  <div id="header">  
+      
+      <div class="container_16 container_header_top clearfix">
+        <div class="grid_16">
+		  <div id="headimg">
+
+    
+  <div id="logo-text">
+    <span class="site-name"><a href="https://datascience.blog.wzb.eu/" title="WZB Data Science Blog" rel="home">WZB Data Science Blog</a></span>
+    <span class="site-description"></span>
+  </div><!-- end of #logo -->
+  
+  
+</div>        </div>
+      </div>
+      
+      <div id="nav">
+        <div class="container_16 clearfix">
+          <div class="grid_16">
+            <div class="menu clearfix"><ul id="menu-main-menu" class="sf-menu sf-js-enabled"><li id="menu-item-22" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-22"><a href="https://datascience.blog.wzb.eu/">Home</a></li>
+<li id="menu-item-157" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-157"><a href="https://datascience.blog.wzb.eu/category/linkdump/">Weekly link dumps</a></li>
+<li id="menu-item-26" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-26"><a href="https://datascience.blog.wzb.eu/2016/06/14/welcome-to-the-wzb-data-science-blog/">About</a></li>
+<li id="menu-item-23" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-23"><a href="https://datascience.blog.wzb.eu/impressum/">Legal notice / Impressum</a></li>
+</ul></div>          </div>
+        </div>
+      </div>      
+  
+  </div>
+<div class="container_16 clearfix">
+  
+  <div class="grid_11">
+    <div id="content">	  
+	  
+	        
+                
+          <div id="post-30" class="post-30 post type-post status-publish format-standard hentry category-nlp category-python">
+  
+  <h1 class="entry-title entry-title-single">Creating a sparse Document Term Matrix for Topic Modeling via LDA</h1>
+  
+  <div class="entry-meta">    
+	<span class="entry-date" title="June 17, 2016 11:23 am"><a href="https://datascience.blog.wzb.eu/2016/06/17/creating-a-sparse-document-term-matrix-for-topic-modeling-via-lda/" title="Creating a sparse Document Term Matrix for Topic Modeling via LDA" rel="bookmark">June 17, 2016 11:23 am</a></span><span class="entry-meta-sep"> , </span><span class="entry-author author vcard"><a href="https://datascience.blog.wzb.eu/author/markus_konrad/" title="by Markus Konrad" rel="author">Markus Konrad</a></span>  </div><!-- .entry-meta -->
+  
+  <div class="entry-content clearfix">
+  	<p>To do topic modeling with methods like <a href="https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation">Latent Dirichlet Allocation</a>, it is necessary to build a Document Term Matrix (DTM) that contains the number of term occurrences per document. The rows of the DTM usually represent the documents and the columns represent the whole vocabulary, i.e. the set union of all terms that appear in all documents.</p>
+<p>The DTM will contain mostly zero values when we deal with natural language documents, because from the vast vocabulary of possible terms from <em>all</em> documents, only a few will be used in the individual documents (even after normalizing the vocabulary with stemming or lemmatization). Hence the DTM will be a <em>sparse</em> matrix in most cases — and this fact should be exploited to achieve good memory efficiency.</p>
+<p><span id="more-30"></span></p>
+<p>The memory consumption for the DTM can be calculated by <code>n_docs * n_vocab * n_bytes</code>, with the number of documents, number of terms in the vocabulary and the number of bytes needed to store a single value respectively. This number can become quite big even with a medium-sized corpus. In a recent project I processed a corpus of ~19,000 documents which had a vocabulary of ~170,000 terms. If you store this in a DTM with 32-bit integers, you get a DTM that consumes about 12 GB. This might already be too much for a desktop computer and furthermore, it just takes too much processing time to produce this huge matrix.</p>
+<p>In such a case, it’s best to utilize the fact that the DTM is a sparse matrix and only store the non-zero values of the matrix in memory.  In Python this can be done with <a href="http://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.coo_matrix.html">scipy’s <code>coo_matrix</code> (“coordinate list – COO” format) functions</a>, which can be later used with Python’s <a href="https://pythonhosted.org/lda/">lda</a> package for topic modeling. The memory and processing time savings can be huge: In my example, the DTM had less than 1% non-zero values. In COO format, such a matrix consumes only about <code>3 * n_nonzero * n_bytes</code> bytes, which means only about 360 MB instead of 12 GB for the given example.</p>
+<h2>Creating a sparse matrix</h2>
+<p>In order to create a sparse matrix, we need to pass the data to <code>coo_matrix()</code> in a certain format, which is given as follows in the documentation:</p>
+<p><code>coo_matrix((data, (i, j)))</code>, with <code>data</code> being an array of all non-zero values, <code>i</code> being an array of row indices for each entry in <code>data</code> and <code>j</code> being an array of column indices for each entry in <code>data</code> (hence the memory consumption of <code>3 * n_nonzero</code>).</p>
+<p>Let’s create a sparse 3×4 matrix which should look like this:</p>
+<pre><code class="hljs cpp"><span class="hljs-number">7</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">8</span>
+<span class="hljs-number">0</span> <span class="hljs-number">9</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>
+</code></pre>
+<p>Our non-zero values are <code>[7, 8, 9]</code>, the row indices are <code>[0, 1, 2]</code> (7 in row 0, 8 in row 1, etc.) and the column indices are <code>[0, 3, 1]</code> (7 in column 0, 8 in column 3, etc.). So we can create this matrix as follows:</p>
+<pre><code class="python hljs"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> scipy.sparse <span class="hljs-keyword">import</span> coo_matrix
+
+data = np.array([<span class="hljs-number">7</span>, <span class="hljs-number">8</span>, <span class="hljs-number">9</span>])
+rows = np.array([<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>])
+cols = np.array([<span class="hljs-number">0</span>, <span class="hljs-number">3</span>, <span class="hljs-number">1</span>])
+
+m = coo_matrix((data, (rows, cols)), shape=(<span class="hljs-number">3</span>, <span class="hljs-number">4</span>))
+</code></pre>
+<p>It is best to explicitly define the matrix’ shape with the <code>shape</code> parameter, otherwise it is “inferred from the index arrays” which might not be what you want. When we print this matrix, we’ll get the stored non-zero values along with their matrix indices:</p>
+<pre><code class="hljs cpp">print(m)
+  (<span class="hljs-number">0</span>, <span class="hljs-number">0</span>)        <span class="hljs-number">7</span>
+  (<span class="hljs-number">1</span>, <span class="hljs-number">3</span>)        <span class="hljs-number">8</span>
+  (<span class="hljs-number">2</span>, <span class="hljs-number">1</span>)        <span class="hljs-number">9</span>
+</code></pre>
+<p>In order to verify that this is the matrix that we wanted, we can convert it back to a normal “dense” matrix and print it:</p>
+<pre><code class="hljs cpp">print(m.toarray())
+  [[<span class="hljs-number">7</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>]
+   [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">8</span>]
+   [<span class="hljs-number">0</span> <span class="hljs-number">9</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>]]
+</code></pre>
+<h2>Creating a sparse DTM</h2>
+<p>Suppose that we processed a corpus of documents and created a dictionary with their respective terms that looks like the following:</p>
+<pre><code class="python hljs">docs = {
+    <span class="hljs-string">'doc1'</span>: [<span class="hljs-string">'python'</span>, <span class="hljs-string">'text'</span>, <span class="hljs-string">'data'</span>, <span class="hljs-string">'nlp'</span>, <span class="hljs-string">'data'</span>, <span class="hljs-string">'matrix'</span>, <span class="hljs-string">'mining'</span>],
+    <span class="hljs-string">'doc2'</span>: [<span class="hljs-string">'data'</span>, <span class="hljs-string">'science'</span>, <span class="hljs-string">'data'</span>, <span class="hljs-string">'processing'</span>, <span class="hljs-string">'cleaning'</span>, <span class="hljs-string">'data'</span>],
+    <span class="hljs-string">'doc3'</span>: [<span class="hljs-string">'r'</span>, <span class="hljs-string">'data'</span>, <span class="hljs-string">'science'</span>, <span class="hljs-string">'text'</span>, <span class="hljs-string">'mining'</span>, <span class="hljs-string">'nlp'</span>],
+    <span class="hljs-string">'doc4'</span>: [<span class="hljs-string">'programming'</span>, <span class="hljs-string">'c'</span>, <span class="hljs-string">'algorithms'</span>, <span class="hljs-string">'data'</span>, <span class="hljs-string">'structures'</span>],
+}
+</code></pre>
+<p>We want to create a sparse DTM from that. In order to do that, we need the following:</p>
+<ul>
+<li>an array of document names — this will represent the rows of the DTM</li>
+<li>an array with the complete vocabulary (all words used in all documents) — this will represent the columns of the DTM</li>
+<li>the number of non-zero values in the DTM — think of this as the number of unique terms per documents since each unique term in a document will turn up as a non-zero value in a DTM row</li>
+</ul>
+<p>We can compute these things quite easily by using <a href="https://docs.python.org/3/library/stdtypes.html#set">Python’s set type</a> which stores unique elements (i.e. all unique terms in a document) and lets us employ <a href="http://www.linuxtopia.org/online_books/programming_books/python_programming/python_ch16s03.html">set operations</a>:</p>
+<pre><code class="python hljs">n_nonzero = <span class="hljs-number">0</span>
+<span class="hljs-keyword">for</span> docterms <span class="hljs-keyword">in</span> docs.values():
+    unique_terms = set(docterms)    <span class="hljs-comment"># all unique terms of this doc</span>
+    vocab |= unique_terms           <span class="hljs-comment"># set union: add unique terms of this doc</span>
+    n_nonzero += len(unique_terms)  <span class="hljs-comment"># add count of unique terms in this doc</span>
+
+<span class="hljs-comment"># make a list of document names</span>
+<span class="hljs-comment"># the order will be the same as in the dict</span>
+docnames = list(docs.keys())
+</code></pre>
+<p>Now we have everything set up to create our sparse DTM. First we’ll convert some lists/sets to NumPy arrays because we’ll use NumPy functions for fast processing:</p>
+<pre><code class="python hljs">docnames = np.array(docnames)
+vocab = np.array(list(vocab))  
+</code></pre>
+<p>We will also need an array that holds the indices that would sort <code>vocab</code>. With this array, we can later identify the terms of each document by their index and also the count of how often these terms occur:</p>
+<pre><code class="python hljs">vocab_sorter = np.argsort(vocab)    <span class="hljs-comment"># indices that sort "vocab"</span>
+</code></pre>
+<p>The dimensions of our DTM will be <code>len(docnames)</code> by <code>len(vocab)</code>:</p>
+<pre><code class="python hljs">ndocs = len(docnames)
+nvocab = len(vocab)
+</code></pre>
+<p>We also need the three arrays for creating our <code>coo_matrix</code> as explained before. It’s much faster allocating empty memory for these arrays (we already know their size!) and filling them for each document than enlarging these arrays in a loop for each document. It’s also good to specify a data type directly — in this case a “C integer” which means a 32 bit integer. Otherwise NumPy will use a default data type of 64 bit float, which is a waste of memory in our case.</p>
+<pre><code class="python hljs">data = np.empty(n_nonzero, dtype=np.intc)     <span class="hljs-comment"># all non-zero term frequencies at data[k]</span>
+rows = np.empty(n_nonzero, dtype=np.intc)     <span class="hljs-comment"># row index for kth data item (kth term freq.)</span>
+cols = np.empty(n_nonzero, dtype=np.intc)     <span class="hljs-comment"># column index for kth data item (kth term freq.)</span>
+</code></pre>
+<p>Now comes the most important part. We’ll write a loop that goes through all documents. For each list of terms in each document, we get the indices into <code>vocab_sorter</code>. This variable is called <code>term_indices</code>. If <code>vocab</code> had the terms “c, d, b, a” then <code>vocab_sorter</code> had the indices that sort <code>vocab</code> (i.e. <code>[2, 3, 1, 0]</code>). If <code>terms</code> in a document was “d, a, a, b” then <code>term_indices</code> would be <code>[3, 0, 0, 1]</code>. By using <code>np.unique()</code> we then get only the unique values in <code>term_indices</code> and as a bonus also the counts of each value (as in a histogram). So <code>uniq_indices</code> and <code>counts</code> will be <code>[3, 0, 1]</code> and <code>[1, 2, 1]</code> respectively. The former are the column indices in the DTM  (remember that the columns represent the vocabulary) and the latter represent the actual <em>values</em> in a DTM row (as it is the counts of the terms for this document). The length of the <code>uniq_indices</code> array represents the number unique terms in a document (<code>n_vals = len(uniq_indices)</code>) and hence we need to fill our three sparse DTM arrays <code>data</code>, <code>rows</code> and <code>cols</code> from the current index <code>ind</code> up to <code>ind + n_vals</code>: <code>data[ind:ind_end] = counts</code> and <code>cols[ind:ind_end] = uniq_indices</code>. The only thing that’s left is to save the DTM row indices which represent the documents. At first we find out which document index represents our document name: <code>doc_idx = np.where(docnames == docname)</code>. Then we fill in this value repeatedly: <code>rows[ind:ind_end] = np.repeat(doc_idx, n_vals)</code>.</p>
+<p>We do this all over for all documents. As a Python script this reads as follows:</p>
+<pre><code class="python hljs">ind = <span class="hljs-number">0</span>     <span class="hljs-comment"># current index in the sparse matrix data</span>
+<span class="hljs-comment"># go through all documents with their terms</span>
+<span class="hljs-keyword">for</span> docname, terms <span class="hljs-keyword">in</span> docs.items():
+    <span class="hljs-comment"># find indices into  such that, if the corresponding elements in  were</span>
+    <span class="hljs-comment"># inserted before the indices, the order of  would be preserved</span>
+    <span class="hljs-comment"># -&gt; array of indices of  in </span>
+    term_indices = vocab_sorter[np.searchsorted(vocab, terms, sorter=vocab_sorter)]
+
+    <span class="hljs-comment"># count the unique terms of the document and get their vocabulary indices</span>
+    uniq_indices, counts = np.unique(term_indices, return_counts=<span class="hljs-keyword">True</span>)
+    n_vals = len(uniq_indices)  <span class="hljs-comment"># = number of unique terms</span>
+    ind_end = ind + n_vals  <span class="hljs-comment">#  to  is the slice that we will fill with data</span>
+
+    data[ind:ind_end] = counts                  <span class="hljs-comment"># save the counts (term frequencies)</span>
+    cols[ind:ind_end] = uniq_indices            <span class="hljs-comment"># save the column index: index in </span>
+    doc_idx = np.where(docnames == docname)     <span class="hljs-comment"># get the document index for the document name</span>
+    rows[ind:ind_end] = np.repeat(doc_idx, n_vals)  <span class="hljs-comment"># save it as repeated value</span>
+
+    ind = ind_end  <span class="hljs-comment"># resume with next document -&gt; add data to the end</span>
+</code></pre>
+<p>Finally, we can create the <code>coo_matrix</code>:</p>
+<pre><code class="python hljs">dtm = coo_matrix((data, (rows, cols)), shape=(ndocs, nvocab), dtype=np.intc)
+</code></pre>
+<p>Let’s have look if the DTM is correct for our example:</p>
+<pre><code class="hljs nginx"><span class="hljs-title">docnames</span>
+  [<span class="hljs-string">'doc1'</span>, <span class="hljs-string">'doc4'</span>, <span class="hljs-string">'doc3'</span>, <span class="hljs-string">'doc2'</span>]
+vocab
+  [<span class="hljs-string">'science'</span>, <span class="hljs-string">'mining'</span>, <span class="hljs-string">'c'</span>, <span class="hljs-string">'text'</span>, <span class="hljs-string">'nlp'</span>, <span class="hljs-string">'structures'</span>,
+   <span class="hljs-string">'processing'</span>, <span class="hljs-string">'matrix'</span>, <span class="hljs-string">'r'</span>, <span class="hljs-string">'algorithms'</span>, <span class="hljs-string">'data'</span>,
+   <span class="hljs-string">'programming'</span>, <span class="hljs-string">'python'</span>, <span class="hljs-string">'cleaning'</span>]
+dtm.toarray()
+  [[<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">2</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>],
+   [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+   [<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>],
+   [<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">3</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>]]
+</code></pre>
+<p>It is important that neither <code>docnames</code> nor <code>vocab</code> is sorted in some way so don’t get confused!<br>
+Let’s look at the first “1” in the first DTM row: It says that for <code>docnames[0]</code> (“doc1”) <code>vocab[1]</code> (“mining”) occurs once, which is correct. Let’s look at the only value “2” in the first DTM row: It says that for <code>docnames[0]</code> (“doc1”) <code>vocab[10]</code> (“data”) occurs twice, which is also correct. At last, let’s look at the only value “3” in the fourth DTM row: It says that for <code>docnames[3]</code> (“doc2”) <code>vocab[10]</code> (“data”) occurs three times (correct).</p>
+<p>Finally, let’s plug this DTM into Python’s <a href="https://pythonhosted.org/lda/">lda</a> package. We should definitely have a much bigger corpus for proper topic modeling, but for demonstration purposes let’s find out three topics with three common top words each:</p>
+<pre><code class="python hljs">model = lda.LDA(n_topics=<span class="hljs-number">3</span>, n_iter=<span class="hljs-number">1000</span>, random_state=<span class="hljs-number">1</span>)
+
+model.fit(dtm)
+
+topic_word = model.topic_word_
+n_top_words = <span class="hljs-number">3</span>
+
+<span class="hljs-keyword">for</span> i, topic_dist <span class="hljs-keyword">in</span> enumerate(topic_word):
+    topic_words = np.array(vocab)[np.argsort(topic_dist)][:-(n_top_words+<span class="hljs-number">1</span>):-<span class="hljs-number">1</span>]
+    print(<span class="hljs-string">'Topic {}: {}'</span>.format(i, <span class="hljs-string">' '</span>.join(topic_words)))
+</code></pre>
+<p>Although the corpus was so small, LDA returns topics that actually make sense regarding the commonly used terms in the documents:</p>
+<pre><code class="hljs cpp">Topic <span class="hljs-number">0</span>: data science cleaning
+Topic <span class="hljs-number">1</span>: programming algorithms structures
+Topic <span class="hljs-number">2</span>: nlp text mining
+</code></pre>
+  </div> <!-- end .entry-content -->
+  
+    
+  <div class="entry-meta-bottom">
+  <span class="cat-links"><span class="entry-utility-prep entry-utility-prep-cat-links">Posted in:</span> <a href="https://datascience.blog.wzb.eu/category/nlp/" rel="category tag">NLP &amp; Text Analysis</a>, <a href="https://datascience.blog.wzb.eu/category/python/" rel="category tag">Python</a></span>  </div><!-- .entry-meta -->
+
+</div> <!-- end #post-30 .post_class -->
+
+ 
+
+<div id="comments" class="grid_inside">
+  
+  
+    <p class="nocomments">Comments are closed.</p>
+  
+  
+</div><!-- #comments -->        
+              
+            
+      <div id="loop-nav-singlular-post" class="clearfix">
+  <h3 class="assistive-text">Post Navigation</h3>
+  <div class="loop-nav-previous grid_6 alpha">
+    <a href="https://datascience.blog.wzb.eu/2016/06/14/welcome-to-the-wzb-data-science-blog/" rel="prev"><span class="meta-nav">←</span> Previous Post</a>  </div>
+  <div class="loop-nav-next grid_5 omega">
+	<a href="https://datascience.blog.wzb.eu/2016/06/17/linkdump-1/" rel="next">Next Post <span class="meta-nav">→</span></a>  </div>
+</div><!-- end #loop-nav-singular-post -->
+    
+    </div> <!-- end #content -->
+  </div> <!-- end .grid_11 -->
+  
+  <div class="grid_5">
+  <div id="sidebar">
+  
+	<div id="text-2" class="widget widget_text widget-widget_text clearfix"><div class="widget-wrap widget-inside">			<div class="textwidget"><a href="https://wzb.eu/" target="_blank" rel="noopener noreferrer"><img src="./Creating a sparse Document Term Matrix for Topic Modeling via LDA _ WZB Data Science Blog_files/wzbfirmierungquerschwarzmitschrift.png" alt="WZB Logo" title="Wissenschaftszentrum Berlin für Sozialforschung" scale="0"></a></div>
+		</div></div><div id="search-3" class="widget widget_search widget-widget_search clearfix"><div class="widget-wrap widget-inside"><div class="search">
+  <form method="get" class="searchform" action="https://datascience.blog.wzb.eu/">
+    <label for="s" class="assistive-text">Search for:</label>
+    <input type="text" class="field" name="s" id="s" value="Search" onfocus="if(this.value==this.defaultValue)this.value=&#39;&#39;;" onblur="if(this.value==&#39;&#39;)this.value=this.defaultValue;">
+    <input type="submit" class="submit" name="submit" id="searchsubmit" value="Search">
+  </form>
+</div><!-- end .search --></div></div>		<div id="recent-posts-3" class="widget widget_recent_entries widget-widget_recent_entries clearfix"><div class="widget-wrap widget-inside">		<h3 class="widget-title">Recent posts</h3>		<ul>
+											<li>
+					<a href="https://datascience.blog.wzb.eu/2019/11/01/linkdump-123/">Linkdump #123</a>
+									</li>
+											<li>
+					<a href="https://datascience.blog.wzb.eu/2019/10/18/linkdump-122/">Linkdump #122</a>
+									</li>
+											<li>
+					<a href="https://datascience.blog.wzb.eu/2019/09/27/linkdump-121/">Linkdump #121</a>
+									</li>
+											<li>
+					<a href="https://datascience.blog.wzb.eu/2019/09/06/linkdump-120/">Linkdump #120</a>
+									</li>
+											<li>
+					<a href="https://datascience.blog.wzb.eu/2019/08/23/linkdump-119/">Linkdump #119</a>
+									</li>
+					</ul>
+		</div></div><div id="categories-3" class="widget widget_categories widget-widget_categories clearfix"><div class="widget-wrap widget-inside"><h3 class="widget-title">Categories</h3>		<ul>
+				<li class="cat-item cat-item-17"><a href="https://datascience.blog.wzb.eu/category/javascript/d3-js/">d3.js</a> (3)
+</li>
+	<li class="cat-item cat-item-13"><a href="https://datascience.blog.wzb.eu/category/data-mining/">Data Mining</a> (8)
+</li>
+	<li class="cat-item cat-item-10"><a href="https://datascience.blog.wzb.eu/category/databases/">Databases</a> (3)
+</li>
+	<li class="cat-item cat-item-14"><a href="https://datascience.blog.wzb.eu/category/web-development/django/">Django</a> (3)
+</li>
+	<li class="cat-item cat-item-20"><a href="https://datascience.blog.wzb.eu/category/experiment-implementation/">Experiment Implementation</a> (3)
+</li>
+	<li class="cat-item cat-item-3"><a href="https://datascience.blog.wzb.eu/category/general/">General</a> (2)
+</li>
+	<li class="cat-item cat-item-22"><a href="https://datascience.blog.wzb.eu/category/gis/">GIS</a> (5)
+</li>
+	<li class="cat-item cat-item-9"><a href="https://datascience.blog.wzb.eu/category/io/">IO</a> (2)
+</li>
+	<li class="cat-item cat-item-16"><a href="https://datascience.blog.wzb.eu/category/javascript/">JavaScript</a> (1)
+</li>
+	<li class="cat-item cat-item-8"><a href="https://datascience.blog.wzb.eu/category/linkdump/" title="A (mostly) weekly collection of interesting links to news and articles that I find worth reading.">Linkdump</a> (122)
+</li>
+	<li class="cat-item cat-item-23"><a href="https://datascience.blog.wzb.eu/category/machine-learning/">Machine Learning</a> (3)
+</li>
+	<li class="cat-item cat-item-27"><a href="https://datascience.blog.wzb.eu/category/network-analysis/">Network analysis</a> (2)
+</li>
+	<li class="cat-item cat-item-6"><a href="https://datascience.blog.wzb.eu/category/nlp/">NLP &amp; Text Analysis</a> (9)
+</li>
+	<li class="cat-item cat-item-21"><a href="https://datascience.blog.wzb.eu/category/experiment-implementation/otree/">oTree</a> (3)
+</li>
+	<li class="cat-item cat-item-25"><a href="https://datascience.blog.wzb.eu/category/parallel-computing/">Parallel computing</a> (2)
+</li>
+	<li class="cat-item cat-item-12"><a href="https://datascience.blog.wzb.eu/category/pdfs/">PDFs</a> (5)
+</li>
+	<li class="cat-item cat-item-26"><a href="https://datascience.blog.wzb.eu/category/presentation-slides/">Presentation slides</a> (2)
+</li>
+	<li class="cat-item cat-item-7"><a href="https://datascience.blog.wzb.eu/category/python/">Python</a> (26)
+</li>
+	<li class="cat-item cat-item-18"><a href="https://datascience.blog.wzb.eu/category/r/">R</a> (8)
+</li>
+	<li class="cat-item cat-item-15"><a href="https://datascience.blog.wzb.eu/category/visualization/">Visualization</a> (11)
+</li>
+	<li class="cat-item cat-item-11"><a href="https://datascience.blog.wzb.eu/category/web-development/">Web Development</a> (4)
+</li>
+	<li class="cat-item cat-item-24"><a href="https://datascience.blog.wzb.eu/category/data-mining/web-scraping/">Web Scraping</a> (3)
+</li>
+		</ul>
+			</div></div><div id="nav_menu-3" class="widget widget_nav_menu widget-widget_nav_menu clearfix"><div class="widget-wrap widget-inside"><h3 class="widget-title">Links</h3><div class="menu-links-container"><ul id="menu-links" class="menu"><li id="menu-item-29" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-29"><a href="https://wzb.eu/">WZB Website</a></li>
+<li id="menu-item-126" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-126"><a href="https://github.com/WZBSocialScienceCenter/">WZB @ Github</a></li>
+<li id="menu-item-246" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-246"><a href="https://www.r-bloggers.com/">R-bloggers</a></li>
+</ul></div></div></div>  
+  </div> <!-- end #sidebar -->
+</div>  <!-- end .grid_5 -->
+</div> <!-- end .container_16 -->
+  
+  <div id="footer">
+    <div class="container_16">
+      <div class="grid_5">
+  © Copyright 2019 - <a href="https://datascience.blog.wzb.eu/">WZB Data Science Blog</a></div>
+<div class="grid_11">
+  Vortex Theme by <a href="http://wpvortex.com/" title="WPVortex">WPVortex</a> ⋅ <a href="http://wordpress.org/" title="WordPress">WordPress</a>
+</div>
+    </div>
+  </div>
+
+</div> <!-- end .wrapper -->
+<script type="text/javascript" src="./Creating a sparse Document Term Matrix for Topic Modeling via LDA _ WZB Data Science Blog_files/devicepx-jetpack.js.download"></script>
+<script type="text/javascript" src="./Creating a sparse Document Term Matrix for Topic Modeling via LDA _ WZB Data Science Blog_files/superfish-combine.min.js.download"></script>
+<script type="text/javascript" src="./Creating a sparse Document Term Matrix for Topic Modeling via LDA _ WZB Data Science Blog_files/common.js.download"></script>
+<script type="text/javascript" src="./Creating a sparse Document Term Matrix for Topic Modeling via LDA _ WZB Data Science Blog_files/wp-embed.js.download"></script>
+<script type="text/javascript" src="./Creating a sparse Document Term Matrix for Topic Modeling via LDA _ WZB Data Science Blog_files/e-201944.js.download" async="async" defer="defer"></script>
+<script type="text/javascript">
+	_stq = window._stq || [];
+	_stq.push([ 'view', {v:'ext',j:'1:7.5.2',blog:'120723120',post:'30',tz:'2',srv:'datascience.blog.wzb.eu'} ]);
+	_stq.push([ 'clickTrackerInit', '120723120', '30' ]);
+</script>
+
+<img src="./Creating a sparse Document Term Matrix for Topic Modeling via LDA _ WZB Data Science Blog_files/g.gif" alt=":)" width="6" height="5" id="wpstats" scale="0"></body></html>

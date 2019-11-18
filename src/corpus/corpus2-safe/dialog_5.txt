@@ -1,0 +1,44 @@
+$$$Dialog on a Canvas with a Machine
+$$$https://arxiv.org/pdf/1910.04386.pdf
+
+We propose a new form of human-machine interaction. It is a pictorial game
+consisting of interactive rounds of creation between artists and a machine. They
+repetitively paint one after the other. At its rounds, the computer partially completes
+the drawing using machine learning algorithms, and projects its additions directly
+on the canvas, which the artists are free to insert or modify. Alongside fostering
+creativity, the process is designed to question the growing interaction between
+humans and machines.
+
+***
+
+With the on-going technological revolution, the human-machine interaction is
+deeply evolving. Hence art creation could benefit of new tools while simultaneously supporting
+thoughts of how these interactions are affecting humans.
+Recently, GANs put a spotlight on the creative power of neural networks. For instance were able to generate aesthetic full-stack painting. Yet in these, humans are either
+engineers or curators. 
+
+***
+
+In this work, we propose a new utilisation of the machine, integrating it at the
+core of a human creative process. The idea is to suggest to humans, while painting, ramifications and
+directions of their on-going artwork. In the following, we approach this generic idea under a specific
+interactive framework.
+
+***
+
+The artists found the machine strokes surprising and suggestive of move
+they would not have done by themselves. Actually, some painters have expressed how evocative
+unintended strokes could be. Our installation where the machine projects completions
+without painting, combined with generative network capability, allows to explore that in a principled
+way. Furthermore, the ability to change parameters, such as the learning data set or the amount of
+completion, adds more degree for the human to control their use of the machine.
+
+***
+
+From an outside perspective, the machine distorts their original painting style, both on the short term
+artworks resulting from their interaction (see Figure 2), and on their long term body of work as it
+inspired them on their machine-free paintings. As such, the interaction is not innocuous, even though,
+contrarily to our daily experience, we have made the machine impact as explicit as possible with its
+recognizable blue contributions.
+
+

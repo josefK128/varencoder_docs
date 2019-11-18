@@ -1,0 +1,47 @@
+$$$One-Shot Radiance: Global Illumination Using Convolutional
+Autoencoders
+$$$https://arxiv.org/pdf/1910.02480.pdf
+
+Rendering realistic images with Global Illumination is a computationally demanding task and often requires dedicated
+hardware for feasible runtime. Recent projects have used Generative Adversarial Networks (GAN) to predict indirect lighting
+on an image level, but are limited to diffuse materials and require training on each scene. We present One-Shot Radiance
+(OSR), a novel machine learning technique for rendering Global Illumination using Convolutional Autoencoders. We combine
+a modern denoising Neural Network with Radiance Caching to offer high performance CPU GI rendering while supporting
+a wide range of material types, without the requirement of offline pre-computation or training for each scene. OSR has been
+evaluated on interior scenes, and is able to produce high-quality images within 180 seconds on a single CPU.
+
+***
+
+Ray Tracing is capable of producing photo-realistic images virtually indistinguishable from real pictures. Progressive refinements on rendering algorithms, such as Bi-Directional Path tracing and Metropolis Light Transport have increased
+the efficiency of rendering engines in scenarios in which light paths
+are difficult to evaluate due to the high amount of indirect lighting and Global Illumination. Complex lighting conditions are
+however still highly expensive to resolve, and most algorithms require long rendering times to reduce the noise from Monte Carlo
+sampling.
+
+***
+
+Biased methods have been implemented to produce convincing
+quality images at a fraction of the cost required by a ray tracer.
+An early method, Instant Radiosity [Kel97], exploited the low rate
+of illumination change over diffuse surfaces to approximate GI by
+rendering the same scene many times using Virtual Point Lights
+sampled at locations reached by the main light sources to simulate
+secondary bounces.
+
+***
+
+The most immediate way to apply Machine Learning to graphics
+and ray tracing is to operate on the final rendered image level. These
+approaches start by taking as input a scene rendered from the final camera’s
+viewpoint. They then attempt to output a transformation that results in
+higher visual quality, removal of noise, or addition of effects.
+
+***
+
+Global illumination with radiance regression functions focuses on realtime indirect illumination
+rendering using a neural network that learns the relationship
+between local and contextual attributes such as vertices and light
+position, to the indirect illumination value. This method shows
+very good performance and quality, although it is limited to point
+light sources and requires pre-baking of the Radiance Regression
+Function for each scene.

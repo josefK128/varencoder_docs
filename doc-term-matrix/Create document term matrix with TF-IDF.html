@@ -1,0 +1,866 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0077)https://www.pythonprogramming.in/create-document-term-matrix-with-tf-idf.html -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><script async="" src="./Create document term matrix with TF-IDF_files/analytics.js.download"></script><script>(function main() {
+    // Create enabled event
+    function fireEnabledEvent() {
+        // If gli exists, then we are already present and shouldn't do anything
+        if (!window.gli) {
+            setTimeout(function () {
+                var enabledEvent = document.createEvent("Event");
+                enabledEvent.initEvent("WebGLEnabledEvent", true, true);
+                document.dispatchEvent(enabledEvent);
+            }, 0);
+        } else {
+            //console.log("WebGL Inspector already embedded on the page - disabling extension");
+        }
+    };
+
+    // Grab the path root from the extension
+    document.addEventListener("WebGLInspectorReadyEvent", function (e) {
+        var pathElement = document.getElementById("__webglpathroot");
+        if (window["gliloader"]) {
+            gliloader.pathRoot = pathElement.innerText;
+        } else {
+            // TODO: more?
+            window.gliCssUrl = pathElement.innerText + "gli.all.css";
+        }
+    }, false);
+
+    // Rewrite getContext to snoop for webgl
+    var originalGetContext = HTMLCanvasElement.prototype.getContext;
+    if (!HTMLCanvasElement.prototype.getContextRaw) {
+        HTMLCanvasElement.prototype.getContextRaw = originalGetContext;
+    }
+    HTMLCanvasElement.prototype.getContext = function () {
+        var ignoreCanvas = this.internalInspectorSurface;
+        if (ignoreCanvas) {
+            return originalGetContext.apply(this, arguments);
+        }
+
+        var result = originalGetContext.apply(this, arguments);
+        if (result == null) {
+            return null;
+        }
+
+        var contextNames = ["moz-webgl", "webkit-3d", "experimental-webgl", "webgl", "3d"];
+        var requestingWebGL = contextNames.indexOf(arguments[0]) != -1;
+        if (requestingWebGL) {
+            // Page is requesting a WebGL context!
+            fireEnabledEvent(this);
+
+            // If we are injected, inspect this context
+            if (window.gli) {
+                if (gli.host.inspectContext) {
+                    // TODO: pull options from extension
+                    result = gli.host.inspectContext(this, result);
+                    // NOTE: execute in a timeout so that if the dom is not yet
+                    // loaded this won't error out.
+                    window.setTimeout(function() {
+                        var hostUI = new gli.host.HostUI(result);
+                        result.hostUI = hostUI; // just so we can access it later for debugging
+                    }, 0);
+                }
+            }
+        }
+
+        return result;
+    };
+})();</script><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+
+<title>Create document term matrix with TF-IDF  - PythonProgramming.in</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> <meta name="description" content="Create document term matrix with TF-IDF">
+<meta name="keywords" content="Python Programs">
+<meta name="robots" content="INDEX,FOLLOW">
+<meta property="og:image" content="http://www.pythonprogramming.in/skin/frontend/base/default/pythonbiglogo.png">
+<meta property="twitter:image" content="http://www.pythonprogramming.in/skin/frontend/base/default/pythonbiglogo.png">
+<link rel="icon" href="https://www.pythonprogramming.in/media/favicon/websites/2/python.ico" type="image/x-icon">
+<link rel="shortcut icon" href="https://www.pythonprogramming.in/media/favicon/websites/2/python.ico" type="image/x-icon">
+<link href="./Create document term matrix with TF-IDF_files/css" rel="stylesheet">
+<meta property="og:image" content="http://www.pythonprogramming.in/skin/frontend/base/default/pythonbiglogo.png">
+<meta property="twitter:image" content="http://www.pythonprogramming.in/skin/frontend/base/default/pythonbiglogo.png">
+
+<meta property="og:site_name" content="Python Programming">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Create document term matrix with TF-IDF">
+<meta property="og:description" content="Create document term matrix with TF-IDF">
+<meta property="og:url" content="http://www.pythonprogramming.in/create-document-term-matrix-with-tf-idf.html">
+<meta property="article:published_time" content="2019-04-30T10:51:04+05:30">
+<meta property="article:modified_time" content="2019-07-24 17:14:55">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Create document term matrix with TF-IDF">
+<meta name="twitter:description" content="Create document term matrix with TF-IDF">
+<meta name="twitter:url" content="http://www.pythonprogramming.in/create-document-term-matrix-with-tf-idf.html">
+<meta name="twitter:label1" content="Written by">
+<meta name="twitter:data1" content="Amit Arora">
+<meta name="twitter:label2" content="Filed under">
+<meta name="twitter:data2" content="">
+<meta name="twitter:site" content="@pythoninaction">
+<meta name="twitter:creator" content="@pythoninaction">    
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "publisher": {
+        "@type": "Organization",
+        "name": "Pythonprogramming",
+        "logo": "http://www.pythonprogramming.in/skin/frontend/base/default/python.png"
+    },
+    "author": {
+        "@type": "Person",
+        "name": "Amit Arora",
+        "image": {
+            "@type": "ImageObject",
+            "url": "http://www.pythonprogramming.in/skin/frontend/base/default/python.png",
+            "width": 70,
+            "height": 70
+        },
+        "url": "https://www.quora.com/profile/Amit-Arora-452",
+        "sameAs": [
+            "http://www.pythonprogramming.in/",
+            "https://twitter.com/pythoninaction"
+        ]
+    },
+    "headline": "Create document term matrix with TF-IDF",
+    "url": "http://www.pythonprogramming.in/create-document-term-matrix-with-tf-idf.html",
+    "datePublished": "2019-04-30T10:51:04+05:30",
+    "dateModified": "2019-07-24 17:14:55",
+    "keywords": "",
+    "description": "",
+    "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "http://www.pythonprogramming.in/"
+    }
+}
+</script>
+
+
+
+<link rel="apple-touch-icon" href="https://www.pythonprogramming.in/skin/frontend/python/default/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72" href="https://www.pythonprogramming.in/skin/frontend/python/default/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114" href="https://www.pythonprogramming.in/skin/frontend/python/default/apple-touch-icon-114x114.png">
+<!--[if lt IE 7]>
+<script type="text/javascript">
+//<![CDATA[
+    var BLANK_URL = 'http://www.pythonprogramming.in/js/blank.html';
+    var BLANK_IMG = 'http://www.pythonprogramming.in/js/spacer.gif';
+//]]>
+</script>
+<![endif]-->
+
+<link rel="stylesheet" type="text/css" href="./Create document term matrix with TF-IDF_files/792f7c11539463974ce996822048e769.css">
+<link rel="stylesheet" type="text/css" href="./Create document term matrix with TF-IDF_files/537be9af707ef4f3830664924b6dc49d.css" media="all">
+<link rel="stylesheet" type="text/css" href="./Create document term matrix with TF-IDF_files/8e3a2d8868899d29e84a9b22a84ed9a3.css" media="print">
+<script type="text/javascript" src="./Create document term matrix with TF-IDF_files/00eed23a740bab97c2de663d6fe1e111.js.download"></script>
+<link href="https://www.pythonprogramming.in/python/rss/index/store_id/2/" title="Python" rel="alternate" type="application/rss+xml">
+<link rel="canonical" href="https://www.pythonprogramming.in/create-document-term-matrix-with-tf-idf.html">
+<!--[if IE]>
+<link rel="stylesheet" type="text/css" href="http://www.pythonprogramming.in/media/po_compressor/2/css/897ae6917517b051032145db4394d7a0.css" media="all" />
+<![endif]-->
+<!--[if lt IE 7]>
+<script type="text/javascript" src="http://www.pythonprogramming.in/media/po_compressor/2/js/cc56e77438ce6ca2d24a9726b02d08b6.js"></script>
+<![endif]-->
+<!--[if lte IE 7]>
+<link rel="stylesheet" type="text/css" href="http://www.pythonprogramming.in/media/po_compressor/2/css/267ca633dfa11e81443c15166bac1c8a.css" media="all" />
+<![endif]-->
+<!--[if lte IE 8]>
+<link rel="stylesheet" type="text/css" href="http://www.pythonprogramming.in/media/po_compressor/2/css/eeb92f8d77d42dd9a9fcba1fa0a9cfea.css" media="all" />
+<![endif]-->
+
+<script type="text/javascript">
+//<![CDATA[
+optionalZipCountries = ["HK","IE","MO","PA"];
+//]]>
+</script>
+
+<script type="text/javascript">
+//<![CDATA[
+Mage.Cookies.path     = '/';
+Mage.Cookies.domain   = '.www.pythonprogramming.in';
+//]]>
+</script>
+<script type="text/javascript">//<![CDATA[
+        var Translator = new Translate([]);
+        //]]></script><meta name="msvalidate.01" content="E78528518BA90C3F01609FCD3BE240BE">
+<script src="./Create document term matrix with TF-IDF_files/monetization.js.download" type="text/javascript"></script>
+<meta name="yandex-verification" content="807275fabdb35789">
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-98615249-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+<link rel="stylesheet" type="text/css" href="./Create document term matrix with TF-IDF_files/_grid_python.css" media="all">
+
+<link rel="stylesheet" type="text/css" href="./Create document term matrix with TF-IDF_files/_layout_python.css" media="all">
+
+<link rel="stylesheet" type="text/css" href="./Create document term matrix with TF-IDF_files/_design_python.css" media="all">
+
+
+
+
+<script>
+jQuery(document).ready(function()
+  {
+    jQuery('.leftstick').hide();
+  });
+  jQuery(document).scroll(function () {    
+      var y = jQuery(this).scrollTop();
+      if (y > 1000) {
+          jQuery('.leftstick').fadeIn();
+      } else {
+          jQuery('.leftstick').fadeOut();
+      }
+  });
+jQuery(window).scroll(function() {
+   if(jQuery(window).scrollTop() + jQuery(window).height() > jQuery(document).height() - 50)
+   {
+     jQuery('#tpik').css({"position": "relative"});
+     jQuery('#native-fixed-js').fadeOut(); 
+     
+   }
+   else
+   {
+     jQuery('#tpik').css({"position": "fixed"});
+     jQuery('#native-fixed-js').fadeIn();
+   }
+});
+</script><script id="_bsa_srv-CE7DT5QM_0" type="text/javascript" src="./Create document term matrix with TF-IDF_files/CE7DT5QM.json"></script><script id="_bsa_srv-CE7DT5QM_1" type="text/javascript" src="./Create document term matrix with TF-IDF_files/CE7DT5QM(1).json"></script><script id="_carbonads_projs" type="text/javascript" src="./Create document term matrix with TF-IDF_files/CE7DC53U.json"></script><script charset="utf-8" src="./Create document term matrix with TF-IDF_files/button.d941c9a422e2e3faf474b82a1f39e936.js.download"></script><script id="_bsa_srv-CK7ICK3L_0" type="text/javascript" src="./Create document term matrix with TF-IDF_files/CK7ICK3L.json"></script></head>
+<body class=" catalog-product-view catalog-product-view product-create-document-term-matrix-with-tf-idf "><div id="_flexbar_" data-attributes="{&quot;type&quot;:&quot;flexbar&quot;,&quot;key&quot;:&quot;CK7ICK3L&quot;,&quot;segment&quot;:&quot;placement:wwwpythonprogrammingin&quot;,&quot;options&quot;:{&quot;target&quot;:&quot;body&quot;,&quot;script_id&quot;:&quot;_bsa_srv-CK7ICK3L_0&quot;,&quot;platforms&quot;:[&quot;desktop&quot;,&quot;mobile&quot;]},&quot;ads&quot;:[{&quot;active&quot;:&quot;1&quot;,&quot;ad_via_link&quot;:&quot;https://www.buysellads.com/?utm_source=pythonprogramming-in-flexbar&amp;utm_medium=ad_via_link&amp;utm_campaign=in_unit&amp;utm_term=flexbar&quot;,&quot;backgroundColor&quot;:&quot;#030303&quot;,&quot;backgroundHoverColor&quot;:&quot;#030303&quot;,&quot;bannerid&quot;:&quot;406053&quot;,&quot;callToAction&quot;:&quot;Sign Up Now&quot;,&quot;company&quot;:&quot;Authentic Jobs&quot;,&quot;companyTagline&quot;:&quot;The Leading Job Board For Developers&quot;,&quot;creativeid&quot;:&quot;418110&quot;,&quot;ctaBackgroundColor&quot;:&quot;#30ace3&quot;,&quot;ctaBackgroundHoverColor&quot;:&quot;#30ace3&quot;,&quot;ctaTextColor&quot;:&quot;#FFFFFF&quot;,&quot;ctaTextColorHover&quot;:&quot;#FFFFFF&quot;,&quot;description&quot;:&quot;Your new development career awaits. Check out the latest listings.&quot;,&quot;evenodd&quot;:&quot;0&quot;,&quot;external_id&quot;:&quot;20412&quot;,&quot;height&quot;:&quot;0&quot;,&quot;i&quot;:&quot;0&quot;,&quot;identifier&quot;:&quot;20f8a40c9149e828c1a894237aa5591a&quot;,&quot;image&quot;:&quot;https://cdn4.buysellads.net/uu/1/54760/1570204560-authenticjobs-icon.png&quot;,&quot;logo&quot;:&quot;https://cdn4.buysellads.net/uu/1/54760/1570204565-authenticjobs-logo.png&quot;,&quot;longimp&quot;:&quot;TTDHGG4RTTTTTT3MAORHBTTTTTT4R2HBZWTTTTTT4DPSYUVTTTTTT&quot;,&quot;longlink&quot;:&quot;T6DHGG4RTTTTTT3MAORHBTTTTTT4R2HBZWTTTTTT4DPSYUVTTTTTTBDW5JYFC5JGHREUPRDVKMUFVBZD2QUN6A75K2UNBZ7X5MBCBUSI2RBU6YSHFMUC4RDQ57LLBAIH2WIFPRD2ZRNNP7DQ5MNIBYI327UCPAJC5MBCBUSDKHNUTYZQKRUDBSI35JWUK7V&quot;,&quot;rendering&quot;:&quot;flexbar&quot;,&quot;statimp&quot;:&quot;//srv.buysellads.com/ads/imp/x/GTND42QUCVSD623JCKB4YKQMCA7DPKJ7F6SICZ3JCWSI62QJCYAI4K3KC6BI5KJNCWSDVK3EHJWNBADLKM7UCBZG2Y&quot;,&quot;statlink&quot;:&quot;//srv.buysellads.com/ads/click/x/GTND42QUCVSD623JCKB4YKQMCA7DPKJ7F6SICZ3JCWSI62QJCYAI4K3KC6BI5KJNCWSDVK3EHJNCLSIZ&quot;,&quot;textColor&quot;:&quot;#FFFFFF&quot;,&quot;textColorHover&quot;:&quot;#FFFFFF&quot;,&quot;timestamp&quot;:&quot;1572657903&quot;,&quot;transparentLogo&quot;:&quot;https://cdn4.buysellads.net/uu/1/54760/1570204571-authenticjobs-fit.png&quot;,&quot;width&quot;:&quot;0&quot;,&quot;zoneid&quot;:&quot;33302&quot;,&quot;zonekey&quot;:&quot;CK7ICK3L&quot;}]}"><style>#_flexbar_._bsa_hide ._bsa_flexbar{display:none}#_flexbar_._bsa_show ._bsa_flexbar{display:block}#_flexbar_{display:block}#_flexbar_._bsa_hide{margin-bottom:0}#_flexbar_ ._bsa_flexbar{position:relative;z-index:999999;width:100%;background:#030303;text-align:left;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",Helvetica,Arial,sans-serif !important;-webkit-animation:fadein 2s;-moz-animation:fadein 2s;-ms-animation:fadein 2s;-o-animation:fadein 2s;animation:fadein 2s}#_flexbar_ ._bsa_flexbar:hover{background:#030303}#_flexbar_ .flexbar-wrap{display:flex;padding:18px 40px;text-decoration:none;align-items:center;justify-content:space-between}#_flexbar_ .flexbar-left{display:flex;align-items:center;justify-content:flex-start}#_flexbar_ .flexbar-text{display:flex;flex-direction:column;margin-right:60px}#_flexbar_ .flexbar-heading{color:#FFFFFF;text-transform:uppercase;letter-spacing:1px;font-weight:600;font-size:10px}#_flexbar_ .flexbar-sponsor{letter-spacing:1px;font-weight:400;opacity:.8}#_flexbar_ .flexbar-desc{color:#FFFFFF;letter-spacing:1px;font-size:16px;font-weight:400;line-height:1.3}#_flexbar_ .flexbar-logo{line-height:0}#_flexbar_ .flexbar-logo img{margin:0 30px 0 0;max-width:125px}#_flexbar_ .flexbar-cta{padding:10px 14px;border:0;border-radius:3px;background:#30ace3;color:#FFFFFF;text-decoration:none;text-transform:uppercase;white-space:nowrap;letter-spacing:.5px;font-weight:600;font-size:14px;line-height:1}#_flexbar_ .flexbar-footer{position:absolute;right:40px;bottom:4px;border-top:0;line-height:1;border-top-left-radius:3px;color:#FFFFFF;text-decoration:none;text-transform:uppercase;letter-spacing:1px;font-weight:600;font-size:8px}#_flexbar_ .flexbar-close{color:#FFFFFFcc;cursor:pointer}#_flexbar_ .flexbar-close:hover{color:#FFFFFF}#_flexbar_ .flexbar-via{color:#FFFFFFcc !important;text-decoration:none !important}#_flexbar_ .flexbar-via:hover{color:#FFFFFF !important}@media all and (max-width:768px){#_flexbar_ .flexbar-logo img{max-width:100px}#_flexbar_ .flexbar-heading{font-size:9px;line-height:1.5;margin-bottom:2px}#_flexbar_ .flexbar-desc{font-size:14px}#_flexbar_ .flexbar-cta{font-size:12px}}@media all and (max-width:568px){#_flexbar_ .flexbar-logo img{display:none}#_flexbar_ .flexbar-cta{display:none}#_flexbar_ .flexbar-heading{font-size:8px}#_flexbar_ .flexbar-desc{font-size:12px}#_flexbar_ .flexbar-text{margin-right:0}#_flexbar_ .flexbar-footer{right:15px}#_flexbar_ .flexbar-wrap{padding:20px 15px}}</style><div class="_bsa_flexbar"><a href="https://srv.buysellads.com/ads/click/x/GTND42QUCVSD623JCKB4YKQMCA7DPKJ7F6SICZ3JCWSI62QJCYAI4K3KC6BI5KJNCWSDVK3EHJNCLSIZ?segment=placement:wwwpythonprogrammingin;" class="flexbar-wrap" target="_blank" rel="nofollow noopener"><span class="flexbar-left"><span class="flexbar-logo"><img src="./Create document term matrix with TF-IDF_files/1570204565-authenticjobs-logo.png"></span><span class="flexbar-text"><span class="flexbar-heading"><span class="flexbar-sponsor">Sponsored by</span> Authentic Jobs</span><span class="flexbar-desc">Your new development career awaits. Check out the latest listings.</span></span></span><span class="flexbar-cta">Sign Up Now</span></a><div class="flexbar-footer"><span class="flexbar-close" onclick="_bsa.close(&#39;_flexbar_&#39;)">Hide Ad</span> • <a class="flexbar-via" href="https://www.buysellads.com/?utm_source=pythonprogramming-in-flexbar&amp;utm_medium=ad_via_link&amp;utm_campaign=in_unit&amp;utm_term=flexbar">Ad via BuySellAds</a></div></div></div>
+<div id="root-wrapper">
+<div class="wrapper">
+        <noscript>
+        <div class="global-site-notice noscript">
+            <div class="notice-inner">
+                <p>
+                    <strong>JavaScript seems to be disabled in your browser.</strong><br />
+                    You must have JavaScript enabled in your browser to utilize the functionality of this website.                </p>
+            </div>
+        </div>
+    </noscript>
+    <div class="page">
+        <div class="header-container" id="top">
+
+    <div class="header container">
+		<div class="grid-full">
+          
+            <div class="header-main v-grid-container">
+                <div class="logo-wrapper grid12-2 v-grid">
+                                    <h1 class="logo"><strong>Python Programming</strong><a href="https://www.pythonprogramming.in/" title="Python Programming"><img src="./Create document term matrix with TF-IDF_files/python.png" alt="Python Programming"></a></h1>
+                                </div>
+                
+			<!--<div class="grid12-8 v-grid">-->	<!-- TODO:remove test!!!!!!!!!!!!!! -->
+            
+                <div class="header-top-search-wrapper grid12-6 v-grid clearer">
+                                                        </div>
+                
+                <div class="user-menu clearer grid12-3 v-grid">
+					<img id="showmenu" src="./Create document term matrix with TF-IDF_files/menu_1.png">
+				</div> <!-- end: user-menu -->
+                
+			<!--</div>-->	<!-- TODO:remove test!!!!!!!!!!! -->
+                
+            </div> <!-- end: header-main -->
+    
+        </div> <!-- end: grid unit -->
+    </div> <!-- end: header -->    
+
+</div> <!-- end: header-container -->
+
+<script>
+jQuery(document).ready(function(){
+    jQuery("#showmenu").click(function(){
+        jQuery("#newleftmenu").toggle();
+    });
+});
+</script>        <div class="main-container col3-layout">
+            <div class="main-before-top-container"></div>
+            <div class="main container show-bg">                
+                <div class="col-wrapper no-right-gap grid12-9 grid-col2-main">
+                        <div class="col-main no-left-gap grid12-8 omega grid-col3-main in-col3">
+                          <div class="padding-main">                		
+                        							
+                        <script type="text/javascript">    
+	SyntaxHighlighter.all();
+</script>
+<div id="messages_product_view"></div>
+<div class="product-view">
+
+    
+    
+        <div class="no-display">
+            <input type="hidden" name="product" value="761">
+            <input type="hidden" name="related_product" id="related-products-field" value="">
+        </div>		
+		
+       
+                <div class="product-shop box-additional box-tabs design0 itemprop=" softwaresourcecode"="" itemscope="" itemtype="https://schema.org/SoftwareSourceCode">
+
+            <div class="product-name">
+                <h1 itemprop="name">Create document term matrix with TF-IDF</h1>
+            </div>
+            
+                        
+            								
+				
+								                
+						<div class="coding" itemprop="codeSampleType" style="width: 753.35px;"><p class="shortnew">Convert a collection of raw documents to a matrix of TF-IDF features. TfidfTransformer applies Term Frequency Inverse Document Frequency normalization to a    sparse matrix of occurrence counts. However, CountVectorizer tokenize the documents and count the occurrences of token and return them as a sparse matrix.</p>
+<hr>
+<div><div id="highlighter_144028" class="syntaxhighlighter  python"><div class="toolbar"><span><a href="https://www.pythonprogramming.in/create-document-term-matrix-with-tf-idf.html#" class="toolbar_item command_help help">?</a></span></div><table border="0" cellpadding="0" cellspacing="0"><tbody><tr><td class="gutter"><div class="line number1 index0 alt2">1</div><div class="line number2 index1 alt1">2</div><div class="line number3 index2 alt2">3</div><div class="line number4 index3 alt1">4</div><div class="line number5 index4 alt2">5</div><div class="line number6 index5 alt1">6</div><div class="line number7 index6 alt2">7</div><div class="line number8 index7 alt1">8</div><div class="line number9 index8 alt2">9</div><div class="line number10 index9 alt1">10</div><div class="line number11 index10 alt2">11</div><div class="line number12 index11 alt1">12</div><div class="line number13 index12 alt2">13</div><div class="line number14 index13 alt1">14</div><div class="line number15 index14 alt2">15</div><div class="line number16 index15 alt1">16</div><div class="line number17 index16 alt2">17</div><div class="line number18 index17 alt1">18</div><div class="line number19 index18 alt2">19</div><div class="line number20 index19 alt1">20</div><div class="line number21 index20 alt2">21</div></td><td class="code"><div class="container"><div class="line number1 index0 alt2"><code class="python keyword">import</code> <code class="python plain">pandas as pd</code></div><div class="line number2 index1 alt1"><code class="python keyword">from</code> <code class="python plain">sklearn.feature_extraction.text </code><code class="python keyword">import</code> <code class="python plain">TfidfVectorizer</code></div><div class="line number3 index2 alt2">&nbsp;</div><div class="line number4 index3 alt1"><code class="python comments"># Sample data for analysis</code></div><div class="line number5 index4 alt2"><code class="python plain">data1 </code><code class="python keyword">=</code> <code class="python string">"Java is a language for programming that develops a software for several platforms. A compiled code or bytecode on Java application can run on most of the operating systems including Linux, Mac operating system, and Linux. Most of the syntax of Java is derived from the C++ and C languages."</code></div><div class="line number6 index5 alt1"><code class="python plain">data2 </code><code class="python keyword">=</code> <code class="python string">"Python supports multiple programming paradigms and comes up with a large standard library, paradigms included are object-oriented, imperative, functional and procedural."</code></div><div class="line number7 index6 alt2"><code class="python plain">data3 </code><code class="python keyword">=</code> <code class="python string">"Go is typed statically compiled language. It was created by Robert Griesemer, Ken Thompson, and Rob Pike in 2009. This language offers garbage collection, concurrency of CSP-style, memory safety, and structural typing."</code></div><div class="line number8 index7 alt1">&nbsp;</div><div class="line number9 index8 alt2"><code class="python plain">df1 </code><code class="python keyword">=</code> <code class="python plain">pd.DataFrame({</code><code class="python string">'Java'</code><code class="python plain">: [data1], </code><code class="python string">'Python'</code><code class="python plain">: [data2], </code><code class="python string">'Go'</code><code class="python plain">: [data2]})</code></div><div class="line number10 index9 alt1">&nbsp;</div><div class="line number11 index10 alt2"><code class="python comments"># Initialize</code></div><div class="line number12 index11 alt1"><code class="python plain">vectorizer </code><code class="python keyword">=</code> <code class="python plain">TfidfVectorizer()</code></div><div class="line number13 index12 alt2"><code class="python plain">doc_vec </code><code class="python keyword">=</code> <code class="python plain">vectorizer.fit_transform(df1.iloc[</code><code class="python value">0</code><code class="python plain">])</code></div><div class="line number14 index13 alt1">&nbsp;</div><div class="line number15 index14 alt2"><code class="python comments"># Create dataFrame</code></div><div class="line number16 index15 alt1"><code class="python plain">df2 </code><code class="python keyword">=</code> <code class="python plain">pd.DataFrame(doc_vec.toarray().transpose(),</code></div><div class="line number17 index16 alt2"><code class="python spaces">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code class="python plain">index</code><code class="python keyword">=</code><code class="python plain">vectorizer.get_feature_names())</code></div><div class="line number18 index17 alt1">&nbsp;</div><div class="line number19 index18 alt2"><code class="python comments"># Change column headers</code></div><div class="line number20 index19 alt1"><code class="python plain">df2.columns </code><code class="python keyword">=</code> <code class="python plain">df1.columns</code></div><div class="line number21 index20 alt2"><code class="python functions">print</code><code class="python plain">(df2)</code></div></div></td></tr></tbody></table></div></div>
+<pre class="dos" style="font-family:monospace;">                   Go      Java    Python
+and          0.323751  0.137553  0.323751
+application  0.000000  0.116449  0.000000
+are          0.208444  0.000000  0.208444
+bytecode     0.000000  0.116449  0.000000
+can          0.000000  0.116449  0.000000
+code         0.000000  0.116449  0.000000
+comes        0.208444  0.000000  0.208444
+compiled     0.000000  0.116449  0.000000
+derived      0.000000  0.116449  0.000000
+develops     0.000000  0.116449  0.000000
+<span style="color: #00b100; font-weight: bold;">for</span>          0.000000  0.232898  0.000000
+from         0.000000  0.116449  0.000000
+functional   0.208444  0.000000  0.208444
+imperative   0.208444  0.000000  0.208444
+included     0.208444  0.000000  0.208444
+including    0.000000  0.116449  0.000000
+is           0.000000  0.232898  0.000000
+java         0.000000  0.349347  0.000000
+language     0.000000  0.116449  0.000000
+languages    0.000000  0.116449  0.000000
+large        0.208444  0.000000  0.208444
+library      0.208444  0.000000  0.208444
+linux        0.000000  0.232898  0.000000
+mac          0.000000  0.116449  0.000000
+most         0.000000  0.232898  0.000000
+multiple     0.208444  0.000000  0.208444
+object       0.208444  0.000000  0.208444
+of           0.000000  0.349347  0.000000
+on           0.000000  0.232898  0.000000
+operating    0.000000  0.232898  0.000000
+or           0.000000  0.116449  0.000000
+oriented     0.208444  0.000000  0.208444
+paradigms    0.416889  0.000000  0.416889
+platforms    0.000000  0.116449  0.000000
+procedural   0.208444  0.000000  0.208444
+programming  0.161876  0.068777  0.161876
+python       0.208444  0.000000  0.208444
+run          0.000000  0.116449  0.000000
+several      0.000000  0.116449  0.000000
+software     0.000000  0.116449  0.000000
+standard     0.208444  0.000000  0.208444
+supports     0.208444  0.000000  0.208444
+syntax       0.000000  0.116449  0.000000
+system       0.000000  0.116449  0.000000
+systems      0.000000  0.116449  0.000000
+that         0.000000  0.116449  0.000000
+the          0.000000  0.349347  0.000000
+up           0.208444  0.000000  0.208444
+with         0.208444  0.000000  0.208444
+&nbsp;</pre></div>                
+								
+				
+									
+																
+						
+            			<div class="hidden">
+				<span itemprop="dateCreated">2019-04-30T10:51:04+05:30</span>
+				<span itemprop=" dateModified ">2019-04-30T10:51:04+05:30</span>
+				<span itemprop="creator">Amit Arora</span>
+				<span itemprop="author">Amit Arora</span>
+				<span itemprop="about">Python Programming Tutorial</span>  
+				<span itemprop="programmingLanguage">Python</span>
+				<span itemprop="educationalUse">Practical Solution</span>
+			</div>
+		<div class="clear"></div>
+	
+		<div class="socialshare">
+			<ul>
+			<li class="facebook">
+				<a href="https://www.facebook.com/sharer/sharer.php?u=http://www.pythonprogramming.in/create-document-term-matrix-with-tf-idf.html">Share on Facebook</a>
+			</li>
+			<li class="twitter">
+				<a href="https://twitter.com/home?status=http://www.pythonprogramming.in/create-document-term-matrix-with-tf-idf.html">Share on Twitter</a>
+			</li>
+			</ul>
+		</div>
+		<div class="clear"></div>
+		<div class="askclear">
+			
+
+
+<div class="block block-related-slider">
+	<h3 class="section-title padding-right">Related Examples</h3>
+        <ul class="slides products-grid">
+                            <li class="relt">                    
+                    <h2><a href="https://www.pythonprogramming.in/language-detection-and-translation-using-textblob.html" title="Language detection and translation using TextBlob">Language detection and translation using TextBlob</a></h2>                    
+                </li>
+                            <li class="relt">                    
+                    <h2><a href="https://www.pythonprogramming.in/how-to-read-data-from-docx-file-in-python.html" title="Read data from word file">Read data from word file</a></h2>                    
+                </li>
+                            <li class="relt">                    
+                    <h2><a href="https://www.pythonprogramming.in/how-do-we-convert-text-to-number-using-countvectorizer.html" title="How do we convert text to number using countvectorizer?">How do we convert text to number using countvectorizer?</a></h2>                    
+                </li>
+                            <li class="relt">                    
+                    <h2><a href="https://www.pythonprogramming.in/find-frequency-of-each-word-from-a-text-file-using-nltk.html" title="Find frequency of each word from a text file using NLTK?">Find frequency of each word from a text file using NLTK?</a></h2>                    
+                </li>
+                            <li class="relt">                    
+                    <h2><a href="https://www.pythonprogramming.in/how-to-create-a-word-cloud-from-a-corpus.html" title="How to create a word cloud from a corpus?">How to create a word cloud from a corpus?</a></h2>                    
+                </li>
+                            <li class="relt">                    
+                    <h2><a href="https://www.pythonprogramming.in/how-to-calculate-a-word-word-co-occurrence-matrix.html" title="How to calculate a word-word co-occurrence matrix?">How to calculate a word-word co-occurrence matrix?</a></h2>                    
+                </li>
+                            <li class="relt">                    
+                    <h2><a href="https://www.pythonprogramming.in/sentiment-analysis-with-the-naivebayesanalyzer.html" title="Sentiment Analysis with the NaiveBayesAnalyzer">Sentiment Analysis with the NaiveBayesAnalyzer</a></h2>                    
+                </li>
+                            <li class="relt">                    
+                    <h2><a href="https://www.pythonprogramming.in/how-to-extract-twitter-data-using-twitter-api-in-python.html" title="How to extract twitter data using Twitter API?">How to extract twitter data using Twitter API?</a></h2>                    
+                </li>
+                            <li class="relt">                    
+                    <h2><a href="https://www.pythonprogramming.in/sentiment-analysis-using-textblob.html" title="Sentiment analysis using TextBlob">Sentiment analysis using TextBlob</a></h2>                    
+                </li>
+                            <li class="relt">                    
+                    <h2><a href="https://www.pythonprogramming.in/language-translation-using-goslate.html" title="Language Translation using Goslate">Language Translation using Goslate</a></h2>                    
+                </li>
+                    </ul> <!-- end: slides -->
+</div> <!-- end: block -->
+
+		</div>
+		<div class="clear"></div>
+        </div> <!-- end: product-shop -->
+
+
+        
+    
+    
+    
+</div> <!-- end: product-view -->
+<script type="text/javascript">    
+    jQuery(document).ready(function(){    
+		///var w = jQuery(window).width();
+		var p = jQuery(".product-shop").width();
+		if(p<800){
+			wid=p*0.95;
+		}
+		jQuery('.coding').css('width', wid);    
+    });
+</script>
+<script type="text/javascript">
+    /*var lifetime = 3600;
+    var expireAt = Mage.Cookies.expires;
+    if (lifetime > 0) {
+        expireAt = new Date();
+        expireAt.setTime(expireAt.getTime() + lifetime * 1000);
+    }
+    Mage.Cookies.set('external_no_cache', 1, expireAt);*/
+</script>
+                      </div>               
+                        </div>
+                        <div id="newleftmenu" class="col-left sidebar no-right-gap grid12-4 alpha grid-col3-sidebar in-sidebar">
+                          <div id="myNav" class="leftcolumn">
+                            <div class="chapters" style="margin-top:10px;">
+                            <iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" class="twitter-follow-button twitter-follow-button-rendered" style="position: static; visibility: visible; width: 153px; height: 20px;" title="Twitter Follow Button" src="./Create document term matrix with TF-IDF_files/follow_button.2d991e3dfc9abb2549972ce8b64c5d85.en.html" data-screen-name="Pythonblogging"></iframe><script async="" src="./Create document term matrix with TF-IDF_files/widgets.js.download" charset="utf-8"></script>
+                            </div>
+                            <div class="segment"><span>PYTHON</span> TUTORIAL</div>
+                            <div class="chapters">
+                              <a href="https://www.pythonprogramming.in/variables.html" title="Python Variables Tutorial">Variables</a>
+                              <a href="https://www.pythonprogramming.in/if-else-statements.html" title="Python If…Else Statements">If…Else</a>
+                              <a href="https://www.pythonprogramming.in/while-loops.html" title="Python While Loop">While Loop</a>
+                              <a href="https://www.pythonprogramming.in/for-loops.html" title="Python For Loop">For Loops</a>
+                              <a href="https://www.pythonprogramming.in/list.html" title="Python Lists Tutorial">Lists</a>
+                              <a href="https://www.pythonprogramming.in/dictionary.html" title="Python Dictionary Tutorial">Dictionary</a>
+                              <a href="https://www.pythonprogramming.in/tuples.html" title="Python Tuples Tutorial">Tuples</a>
+                              <a href="https://www.pythonprogramming.in/classes-and-objects.html" title="Python Classes and Objects Tutorial">Classes and Objects</a>
+                              <a href="https://www.pythonprogramming.in/inheritance.html" title="Python Inheritance">Inheritance</a>
+                              <a href="https://www.pythonprogramming.in/method-overriding.html" title="Python Method Overriding">Method Overriding</a>
+                              <a href="https://www.pythonprogramming.in/operator-overloading.html" title="Python Operator Overloading">Operator Overloading</a>
+                              <a href="https://www.pythonprogramming.in/numpy-tutorial-with-examples-and-solutions.html" title="Python NumPy Tutorial">NumPy</a>
+                              </div>
+                            <div class="segment"><span>PYTHON</span> EXAMPLES</div>
+                            <div class="chapters">
+                              <a href="https://www.pythonprogramming.in/basic-python-programs.html" title="Basic Python Examples">Basic</a>
+                              <a href="https://www.pythonprogramming.in/date-time.html" title="Date Time Python Examples">Date Time</a>
+                              <a href="https://www.pythonprogramming.in/strings.html" title="Strings Python Examples">Strings</a>
+                              <a href="https://www.pythonprogramming.in/pandas-examples.html" title="Python pandas Examples">Pandas</a>
+                              <a href="https://www.pythonprogramming.in/matplotlib.html" title="Matplotlib Examples">Matplotlib</a>
+                              <a href="https://www.pythonprogramming.in/natural-language-processing-in-python.html" title="Natural Language Processing Techniques">NLP</a>
+                              <a href="https://www.pythonprogramming.in/object-oriented-programming.html" title="Object Oriented Programming">Object Oriented Programming</a>
+                              <a href="https://www.pythonprogramming.in/twitter-data-mining-in-python.html" title="Twitter Data Mining">Twitter Data Mining</a>
+                            </div>
+                            <div class="segment"><span>TensorFlow</span> BASIC</div>
+                              <div class="chapters programs">
+                                <a href="https://www.pythonprogramming.in/learn-tensorflow-series/introduction-and-installation.html" title="Tensor Flow Introduction and Installation">Introduction and Installation</a>
+                                <a href="https://www.pythonprogramming.in/learn-tensorflow-series/hello-world.html" title="Tensor Flow Hello World">Hello World</a>
+                                <a href="https://www.pythonprogramming.in/learn-tensorflow-series/creating-and-processing-tensors.html" title="Creating and Processing Tensors">Tensors</a>
+                                <a href="https://www.pythonprogramming.in/learn-tensorflow-series/basic-tensor-calculations.html" title="Tensor Flow Basic Tensor Calculations">Tensor Calculations</a>
+                                <a href="https://www.pythonprogramming.in/learn-tensorflow-series/creating-and-accessing-computation-graph-in-tensorflow.html" title="Creating and Accessing Computation Graph in TensorFlow">Computation Graph</a>
+                                <a href="https://www.pythonprogramming.in/learn-tensorflow-series/variables.html" title="Variables in TensorFlow">Variables</a>
+                              </div>
+                          </div>
+                            <div class="leftstick" style="display: none;">
+                                <div id="sponsor-banner" style="margin-top:10px;"><div id="_custom_" data-attributes="{&quot;type&quot;:&quot;custom&quot;,&quot;key&quot;:&quot;CE7DT5QM&quot;,&quot;segment&quot;:&quot;placement:wwwpythonprogrammingin-sidebar&quot;,&quot;options&quot;:{&quot;target&quot;:&quot;#sponsor-banner&quot;,&quot;template&quot;:&quot;\n&lt;a href=\&quot;##link##\&quot; style=\&quot;background: linear-gradient(-330deg, ##backgroundColor##D9, ##backgroundColor##D9 30%, ##backgroundColor## 70%) #fff;\&quot; class=\&quot;native-banner\&quot;&gt;\n&lt;img class=\&quot;native-img\&quot; src=\&quot;##logo##\&quot;&gt;\n&lt;div style=\&quot;color: ##textColor##\&quot; class=\&quot;native-tagline\&quot;&gt;##tagline##&lt;/div&gt;\n&lt;div style=\&quot;color: ##textColor##\&quot; class=\&quot;native-desc\&quot;&gt;##description##&lt;/div&gt;\n&lt;div style=\&quot;color: ##ctaTextColor##; background-color: ##ctaBackgroundColor##;\&quot; class=\&quot;native-cta\&quot;&gt;##callToAction##&lt;/div&gt;\n&lt;div style=\&quot;background-color: ##textColor##B2; color: ##backgroundColor##\&quot; class=\&quot;native-ad\&quot;&gt;Ad&lt;/div&gt;\n&lt;/a&gt;\n&quot;,&quot;script_id&quot;:&quot;_bsa_srv-CE7DT5QM_1&quot;,&quot;platforms&quot;:[&quot;desktop&quot;,&quot;mobile&quot;]},&quot;ads&quot;:[{&quot;active&quot;:&quot;1&quot;,&quot;ad_via_link&quot;:&quot;https://www.buysellads.com/?utm_source=pythonprogramming-in-custom&amp;utm_medium=ad_via_link&amp;utm_campaign=in_unit&amp;utm_term=custom&quot;,&quot;backgroundColor&quot;:&quot;#FFFFFF&quot;,&quot;backgroundHoverColor&quot;:&quot;#FFFFFF&quot;,&quot;bannerid&quot;:&quot;406432&quot;,&quot;callToAction&quot;:&quot;Put a Cap on Drift&quot;,&quot;company&quot;:&quot;Atomist | Drift Management&quot;,&quot;companyTagline&quot;:&quot;What’s Your Technology Drift?&quot;,&quot;creativeid&quot;:&quot;419155&quot;,&quot;ctaBackgroundColor&quot;:&quot;#43B788&quot;,&quot;ctaBackgroundHoverColor&quot;:&quot;#43B788&quot;,&quot;ctaTextColor&quot;:&quot;#FFFFFF&quot;,&quot;ctaTextColorHover&quot;:&quot;#FFFFFF&quot;,&quot;description&quot;:&quot;Outdated dependencies, container images, or delivery pipelines pose significant risks. Get your free drift report today.&quot;,&quot;evenodd&quot;:&quot;0&quot;,&quot;external_id&quot;:&quot;21660&quot;,&quot;height&quot;:&quot;0&quot;,&quot;i&quot;:&quot;0&quot;,&quot;identifier&quot;:&quot;0cf6d14c181cbbcafdf6e76a6ca13c39&quot;,&quot;image&quot;:&quot;https://cdn4.buysellads.net/uu/1/53660/1568147025-Native_Logo_-_80x80.png&quot;,&quot;logo&quot;:&quot;https://cdn4.buysellads.net/uu/1/53660/1568147029-Native_Logo_-_250x100.png&quot;,&quot;longimp&quot;:&quot;T3XUDG4RTTTTTTHEABRHBTTTTTT6FKHBZWTTTTTT4DPSYUVTTTTTT&quot;,&quot;longlink&quot;:&quot;THXUDG4RTTTTTTHEABRHBTTTTTT6FKHBZWTTTTTT4DPSYUVTTTTTTBDW5JYFC5JGHREUVSS22H7UVZID2RNLO7IHKHBFPAIH5KUNVAIQK7B4BSZ327EN57Z2KMUFVZIV5JNNYG7C5MBCBUSI2RBU6YSHFMJN4AI42RU4KRZW2MGNB7Z62HBNBGZD53JLKRZW2MGNCYZ253ENL7S5FMLF67IQ5ENNEYZE53LNAA7C5MBCBUSD2RUFV7Z55EONCYZEHMLF6BZC5E&quot;,&quot;rendering&quot;:&quot;custom&quot;,&quot;statimp&quot;:&quot;//srv.buysellads.com/ads/imp/x/GTND42QUCVSDCK37C6YLYKQMCA7DPKJ7FTBDTZ3JCWSI62QJCWAIT27KC6BI5KJNCWSDVK3EHJWNBADLKM7UCBZG2Y&quot;,&quot;statlink&quot;:&quot;//srv.buysellads.com/ads/click/x/GTND42QUCVSDCK37C6YLYKQMCA7DPKJ7FTBDTZ3JCWSI62QJCWAIT27KC6BI5KJNCWSDVK3EHJNCLSIZ&quot;,&quot;textColor&quot;:&quot;#2A2A2A&quot;,&quot;textColorHover&quot;:&quot;#2A2A2A&quot;,&quot;timestamp&quot;:&quot;1572657902&quot;,&quot;title&quot;:&quot;What’s Your Technology Drift?&quot;,&quot;width&quot;:&quot;0&quot;,&quot;zoneid&quot;:&quot;42095&quot;,&quot;zonekey&quot;:&quot;CE7DT5QM&quot;}]}">
+<a href="https://srv.buysellads.com/ads/click/x/GTND42QUCVSDCK37C6YLYKQMCA7DPKJ7FTBDTZ3JCWSI62QJCWAIT27KC6BI5KJNCWSDVK3EHJNCLSIZ?segment=placement:wwwpythonprogrammingin-sidebar;" style="background: linear-gradient(-330deg, #FFFFFFD9, #FFFFFFD9 30%, #FFFFFF 70%) #fff;" class="native-banner">
+<img class="native-img" src="./Create document term matrix with TF-IDF_files/1568147029-Native_Logo_-_250x100.png">
+<div style="color: #2A2A2A" class="native-tagline">What’s Your Technology Drift?</div>
+<div style="color: #2A2A2A" class="native-desc">Outdated dependencies, container images, or delivery pipelines pose significant risks. Get your free drift report today.</div>
+<div style="color: #FFFFFF; background-color: #43B788;" class="native-cta">Put a Cap on Drift</div>
+<div style="background-color: #2A2A2AB2; color: #FFFFFF" class="native-ad">Ad</div>
+</a>
+</div></div>                          
+                            </div>
+                      </div>
+                </div>
+                <div class="col-right sidebar grid12-3 grid-col2-sidebar in-sidebar">
+                  <div id="tpik" class="rightsidefullbanner" style="position: fixed;">                    
+                    <div class="carbonright">
+                        <script async="" type="text/javascript" src="./Create document term matrix with TF-IDF_files/carbon.js.download" id="_carbonads_js"></script><div id="carbonads"><span><span class="carbon-wrap"><a href="https://srv.carbonads.net/ads/click/x/GTND42QUCVSDCK3NCWALYKQMCA7DPKJ7FTYITZ3JCWSI62QJCWADK2JKC6BI5KJNCWSDVK3EHJNCLSIZ?segment=placement:pythonprogrammingin;" class="carbon-img" target="_blank" rel="noopener sponsored"><img src="./Create document term matrix with TF-IDF_files/1545083324-1539370929-mailchimp-Yellow-260x200.png" alt="ads via Carbon" border="0" style="max-width: 130px;"></a><a href="https://srv.carbonads.net/ads/click/x/GTND42QUCVSDCK3NCWALYKQMCA7DPKJ7FTYITZ3JCWSI62QJCWADK2JKC6BI5KJNCWSDVK3EHJNCLSIZ?segment=placement:pythonprogrammingin;" class="carbon-text" target="_blank" rel="noopener sponsored">Grow customer love with our Marketing CRM.</a></span><a href="http://carbonads.net/?utm_source=pythonprogrammingin&amp;utm_medium=ad_via_link&amp;utm_campaign=in_unit&amp;utm_term=carbon" class="carbon-poweredby" target="_blank" rel="noopener sponsored">ads via Carbon</a><img src="./Create document term matrix with TF-IDF_files/B23311778.257432545" border="0" height="1" width="1" alt="ads via Carbon" style="display: none;"><img src="./Create document term matrix with TF-IDF_files/skeleton.gif" border="0" height="1" width="1" alt="ads via Carbon" style="display: none;"></span></div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+
+        <div class="postscript grid-full in-col1"></div>
+				<div class="preface grid-full in-col1">					
+									</div>
+            </div>
+        </div>
+        <div id="native-fixed-js" style="display: block;"><div id="_custom_" data-attributes="{&quot;type&quot;:&quot;custom&quot;,&quot;key&quot;:&quot;CE7DT5QM&quot;,&quot;segment&quot;:&quot;placement:wwwpythonprogrammingin-fixed&quot;,&quot;options&quot;:{&quot;target&quot;:&quot;#native-fixed-js&quot;,&quot;template&quot;:&quot;\n&lt;div style=\&quot;background-color: ##backgroundColor##\&quot; class=\&quot;native-fixed\&quot;&gt;\n  &lt;a style=\&quot;color: ##textColor##\&quot; class=\&quot;native-link\&quot; href=\&quot;##link##\&quot;&gt;\n    &lt;div class=\&quot;native-sponsor\&quot; style=\&quot;background-color: ##textColor##; color: ##backgroundColor##\&quot;&gt;Sponsor&lt;/div&gt;\n    &lt;div class=\&quot;native-text\&quot;&gt;##company## — ##description##&lt;/div&gt;\n  &lt;/a&gt;\n&lt;/div&gt;\n&quot;,&quot;script_id&quot;:&quot;_bsa_srv-CE7DT5QM_0&quot;,&quot;platforms&quot;:[&quot;desktop&quot;,&quot;mobile&quot;]},&quot;ads&quot;:[{&quot;active&quot;:&quot;1&quot;,&quot;ad_via_link&quot;:&quot;https://www.buysellads.com/?utm_source=pythonprogramming-in-custom&amp;utm_medium=ad_via_link&amp;utm_campaign=in_unit&amp;utm_term=custom&quot;,&quot;backgroundColor&quot;:&quot;#030303&quot;,&quot;backgroundHoverColor&quot;:&quot;#030303&quot;,&quot;bannerid&quot;:&quot;406053&quot;,&quot;callToAction&quot;:&quot;Sign Up Now&quot;,&quot;company&quot;:&quot;Authentic Jobs&quot;,&quot;companyTagline&quot;:&quot;The Leading Job Board For Developers&quot;,&quot;creativeid&quot;:&quot;418110&quot;,&quot;ctaBackgroundColor&quot;:&quot;#30ace3&quot;,&quot;ctaBackgroundHoverColor&quot;:&quot;#30ace3&quot;,&quot;ctaTextColor&quot;:&quot;#FFFFFF&quot;,&quot;ctaTextColorHover&quot;:&quot;#FFFFFF&quot;,&quot;description&quot;:&quot;Your new development career awaits. Check out the latest listings.&quot;,&quot;evenodd&quot;:&quot;0&quot;,&quot;external_id&quot;:&quot;20412&quot;,&quot;height&quot;:&quot;0&quot;,&quot;i&quot;:&quot;0&quot;,&quot;identifier&quot;:&quot;0cf6d14c181cbbcafdf6e76a6ca13c39&quot;,&quot;image&quot;:&quot;https://cdn4.buysellads.net/uu/1/54760/1570204560-authenticjobs-icon.png&quot;,&quot;logo&quot;:&quot;https://cdn4.buysellads.net/uu/1/54760/1570204565-authenticjobs-logo.png&quot;,&quot;longimp&quot;:&quot;T3XUDG4RTTTTTT3MAORHBTTTTTT4R2HBZWTTTTTT4DPSYUVTTTTTT&quot;,&quot;longlink&quot;:&quot;THXUDG4RTTTTTT3MAORHBTTTTTT4R2HBZWTTTTTT4DPSYUVTTTTTTBDW5JYFC5JGHREUPRDVKMUFVBZD2QUN6A75K2UNBZ7X5MBCBUSI2RBU6YSHFMUC4RDQ57LLBAIH2WIFPRD2ZRNNP7DQ5MNIBYI327UCPAJC5MBCBUSDKHNUTYZQKRUDBSI35JWUK7V&quot;,&quot;rendering&quot;:&quot;custom&quot;,&quot;statimp&quot;:&quot;//srv.buysellads.com/ads/imp/x/GTND42QUCVSDCK37C6YLYKQMCA7DPKJ7F6SICZ3JCWSI62QJCYAI4K3KC6BI5KJNCWSDVK3EHJWNBADLKM7UCBZG2Y&quot;,&quot;statlink&quot;:&quot;//srv.buysellads.com/ads/click/x/GTND42QUCVSDCK37C6YLYKQMCA7DPKJ7F6SICZ3JCWSI62QJCYAI4K3KC6BI5KJNCWSDVK3EHJNCLSIZ&quot;,&quot;textColor&quot;:&quot;#FFFFFF&quot;,&quot;textColorHover&quot;:&quot;#FFFFFF&quot;,&quot;timestamp&quot;:&quot;1572657902&quot;,&quot;transparentLogo&quot;:&quot;https://cdn4.buysellads.net/uu/1/54760/1570204571-authenticjobs-fit.png&quot;,&quot;width&quot;:&quot;0&quot;,&quot;zoneid&quot;:&quot;42095&quot;,&quot;zonekey&quot;:&quot;CE7DT5QM&quot;}]}">
+<div style="background-color: #030303" class="native-fixed">
+  <a style="color: #FFFFFF" class="native-link" href="https://srv.buysellads.com/ads/click/x/GTND42QUCVSDCK37C6YLYKQMCA7DPKJ7F6SICZ3JCWSI62QJCYAI4K3KC6BI5KJNCWSDVK3EHJNCLSIZ?segment=placement:wwwpythonprogrammingin-fixed;">
+    <div class="native-sponsor" style="background-color: #FFFFFF; color: #030303">Sponsor</div>
+    <div class="native-text">Authentic Jobs — Your new development career awaits. Check out the latest listings.</div>
+  </a>
+</div>
+</div></div>
+        
+<div class="footer-container">
+
+    
+    <div class="footer-bottom-container section-container">
+        <div class="footer-bottom footer container">
+            <div class="grid-full">
+
+                <div class="section clearer">
+					
+                	<div class="item float-left">
+                    	<div class="copyrightlicence">
+							<span class="footer-copyright">©</span><span class="copyright">2017-19 PythonProgramming.in</span></div>
+						<div class="clear"></div>
+                    </div>
+                    <div class="item float-right">
+                    	<p class="footer-copyright"><a class="footer-copyright" href="https://form.jotform.me/amit5423/python-programming-drop-us-a-line">Drop us a line</a></p>
+                    </div>
+                    
+                </div> <!-- end: footer-bottom section -->
+
+            </div> <!-- end: grid-full -->
+        </div> <!-- end: footer-bottom -->
+    </div>
+    
+    <a href="https://www.pythonprogramming.in/create-document-term-matrix-with-tf-idf.html#top" id="scroll-to-top" style="display: none;">To top</a>
+
+</div> <!-- end: footer-container -->
+
+
+<script type="text/javascript">
+
+			function setGridItemsEqualHeight($)
+	{
+		var SPACING = 20;
+		if ($(window).width() >= 480)
+		{
+			$('.category-products-grid').removeClass("auto-height");
+			
+			var gridItemMaxHeight = 0;
+			$('.category-products-grid > .item').each(function() {
+				$(this).css("height", "auto");
+				
+				////////////////////////////////////////////////////////////////
+									var actionsHeight = $(this).find('.actions').height();
+					$(this).css("padding-bottom", (actionsHeight + SPACING) + "px"); //Set new padding
+								////////////////////////////////////////////////////////////////
+				
+				gridItemMaxHeight = Math.max(gridItemMaxHeight, $(this).height());
+			});
+			
+			//Apply max height
+			$('.category-products-grid > .item').css("height", gridItemMaxHeight + "px");
+		}
+		else
+		{
+			$('.category-products-grid').addClass("auto-height");
+			$('.category-products-grid > .item').css("height", "auto");
+			$('.category-products-grid > .item').css("padding-bottom", "20px");
+		}
+	}
+		
+		function activateMobileMenu($)
+	{
+		if ($(window).width() < 960)
+		{
+			$('#mobnav').show();
+			$('.vertnav-top').addClass('mobile');
+			$('#nav').addClass('mobile');
+		}
+		else
+		{
+			$('#nav').removeClass('mobile');
+			$('.vertnav-top').removeClass('mobile');
+			$('#mobnav').hide();
+		}
+	}
+	
+	
+
+	jQuery(function($) {
+
+				activateMobileMenu(jQuery);
+		
+		
+				$('.collapsible').each(function(index){
+			$(this).prepend('<span class="opener">&nbsp;</span>');
+			if ($(this).hasClass('active'))
+			{
+				$(this).children('.block-content').css('display', 'block');
+			}
+			else
+			{
+				$(this).children('.block-content').css('display', 'none');
+			}			
+		});
+				$('.collapsible .opener').click(function() {
+			
+			var parent = $(this).parent();
+			if (parent.hasClass('active'))
+			{
+				$(this).siblings('.block-content').stop(true).slideUp(300, "easeOutCubic");
+				parent.removeClass('active');
+			}
+			else
+			{
+				$(this).siblings('.block-content').stop(true).slideDown(300, "easeOutCubic");
+				parent.addClass('active');
+			}
+			
+		});
+		
+		
+				var ddOpenTimeout;
+		var dMenuPosTimeout;
+		$(".clickable-dropdown > .dropdown-toggle").click(function() {
+			$(this).parent().addClass('open');
+			$(this).parent().trigger('mouseenter');
+		});
+		$(".dropdown").hover(function() {
+			
+			var DELAY = 300;
+			var ddToggle = $(this).children('.dropdown-toggle');
+			var ddMenu = $(this).children('.dropdown-menu');
+			var ddWrapper = ddMenu.parent(); 			
+						ddMenu.css("left", "");
+			ddMenu.css("right", "");
+			
+						if ($(this).hasClass('clickable-dropdown'))
+			{
+								if ($(this).hasClass('open'))
+				{
+					$(this).children('.dropdown-menu').stop(true, true).delay(DELAY).fadeIn(300, "easeOutCubic");
+				}
+			}
+			else
+			{
+								clearTimeout(ddOpenTimeout);
+				ddOpenTimeout = setTimeout(function() {
+					
+					ddWrapper.addClass('open');
+					
+				}, DELAY);
+				
+				//$(this).addClass('open');
+				$(this).children('.dropdown-menu').stop(true, true).delay(DELAY).fadeIn(300, "easeOutCubic");
+			}
+			
+						clearTimeout(dMenuPosTimeout);
+			dMenuPosTimeout = setTimeout(function() {
+
+				if (ddMenu.offset().left < 0)
+				{
+					var space = ddWrapper.offset().left; 					ddMenu.css("left", (-1)*space);
+					ddMenu.css("right", "auto");
+				}
+			
+			}, DELAY);
+			
+		}, function() {
+			var ddMenu = $(this).children('.dropdown-menu');
+			clearTimeout(ddOpenTimeout); 			ddMenu.stop(true, true).delay(150).fadeOut(300, "easeInCubic");
+			if (ddMenu.is(":hidden"))
+			{
+				ddMenu.hide();
+			}
+			$(this).removeClass('open');
+		});
+
+
+				$('#mobnav-trigger').toggle(function() {
+			$(this).addClass('active');
+			$('.vertnav-top').addClass('show');
+		}, function() {
+			$(this).removeClass('active');
+			$('.vertnav-top').removeClass('show');
+		});
+		
+		
+							$(".main").addClass("show-bg");
+				
+		
+				$(window).scroll(function(){
+			if ($(this).scrollTop() > 100)
+			{
+				$('#scroll-to-top').fadeIn();
+			}
+			else
+			{
+				$('#scroll-to-top').fadeOut();
+			}
+		});
+		$('#scroll-to-top').click(function(){
+			$("html, body").animate({scrollTop: 0}, 600, "easeOutCubic");
+			return false;
+		});
+		
+		
+						
+			var startHeight;
+			var bpad;
+			$('.category-products-grid > .item').hover(function() {
+
+				startHeight = $(this).height();
+				$(this).css("height", "auto"); //Release height
+				$(this).find(".display-onhover").fadeIn(400, "easeInCubic"); //Show elements visible on hover
+				var h2 = $(this).height();
+				
+								////////////////////////////////////////////////////////////////
+				var addtocartHeight = 0;
+				var addtolinksHeight = 0;
+				
+								
+									var addtolinksEl = $(this).find('.add-to-links');
+					if (addtolinksEl.hasClass("addto-onimage") == false)
+						addtolinksHeight = addtolinksEl.height();
+								
+									var h3 = h2 + addtocartHeight + addtolinksHeight;
+					var diff = 0;
+					if (h3 < startHeight)
+					{
+						$(this).height(startHeight);
+					}
+					else
+					{
+						$(this).height(h3); 						diff = h3 - startHeight;
+					}
+								////////////////////////////////////////////////////////////////
+
+				$(this).css("margin-bottom", "-" + diff + "px"); 				
+			}, function() {
+				
+				//Clean up
+				$(this).find(".display-onhover").hide();
+				$(this).css("margin-bottom", "");
+
+													$(this).height(startHeight);
+								
+			});
+		
+				
+		
+		
+				//Window size variables
+		var winWidth = $(window).width();
+		var winHeight = $(window).height();
+		var t;
+		$(window).resize(function() {
+
+						var winNewWidth = $(window).width();
+			var winNewHeight = $(window).height();
+			if (winWidth != winNewWidth || winHeight != winNewHeight)
+			{
+
+				clearTimeout(t);
+				t = setTimeout(function() {
+
+																setGridItemsEqualHeight($);
+									
+										$('.itemslider').each(function(index){
+						var s = $(this).data('flexslider');
+						if (s != null) s.flexAnimate(0);
+					});
+				
+										activateMobileMenu($);
+				
+				}, 100);
+
+			} //end: if
+			//Update window size variables
+			winWidth = winNewWidth;
+			winHeight = winNewHeight;
+
+		}); //end: on resize
+		
+		
+
+	}); /* end: jQuery(){...} */
+	
+	
+	
+	jQuery(window).load(function(){
+		
+							setGridItemsEqualHeight(jQuery);
+		
+	}); /* end: jQuery(window).load(){...} */
+	
+</script>
+                
+
+    </div>
+</div>
+ <!-- end: root-wrapper -->
+<script>
+(function(){  
+  if(typeof _bsa !== 'undefined' && _bsa) {
+      _bsa.init('flexbar', 'CK7ICK3L', 'placement:wwwpythonprogrammingin');
+_bsa.init('custom', 'CE7DT5QM', 'placement:wwwpythonprogrammingin-fixed',
+    {
+      target: '#native-fixed-js',
+      template: `
+<div style="background-color: ##backgroundColor##" class="native-fixed">
+  <a style="color: ##textColor##" class="native-link" href="##link##">
+    <div class="native-sponsor" style="background-color: ##textColor##; color: ##backgroundColor##">Sponsor</div>
+    <div class="native-text">##company## — ##description##</div>
+  </a>
+</div>
+`
+    }
+  );
+_bsa.init('custom', 'CE7DT5QM', 'placement:wwwpythonprogrammingin-sidebar',
+    {
+      target: '#sponsor-banner',
+      template: `
+<a href="##link##" style="background: linear-gradient(-330deg, ##backgroundColor##D9, ##backgroundColor##D9 30%, ##backgroundColor## 70%) #fff;" class="native-banner">
+<img class="native-img" src="##logo##">
+<div style="color: ##textColor##" class="native-tagline">##tagline##</div>
+<div style="color: ##textColor##" class="native-desc">##description##</div>
+<div style="color: ##ctaTextColor##; background-color: ##ctaBackgroundColor##;" class="native-cta">##callToAction##</div>
+<div style="background-color: ##textColor##B2; color: ##backgroundColor##" class="native-ad">Ad</div>
+</a>
+`
+    }
+  ); 
+    }
+})();
+</script>
+<iframe scrolling="no" frameborder="0" allowtransparency="true" src="./Create document term matrix with TF-IDF_files/widget_iframe.2d991e3dfc9abb2549972ce8b64c5d85.html" title="Twitter settings iframe" style="display: none;"></iframe></body></html>

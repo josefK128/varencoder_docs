@@ -1,0 +1,71 @@
+$$$Abstraction
+$$$https://arxiv.org/pdf/1910.03310.pdf
+
+In this article we revisit the concept of abstraction as it is used in visualization and put it on a solid
+formal footing. While the term abstraction is utilized in many scientific disciplines, arts, as well as
+everyday life, visualization inherits the notion of data abstraction or class abstraction from computer
+science, topological abstraction from mathematics, and visual abstraction from arts. All these notions
+have a lot in common, yet there is a major discrepancy in the terminology and basic understanding
+about visual abstraction in the context of visualization. We thus root the notion of abstraction in the
+philosophy of science, clarify the basic terminology, and provide crisp definitions of visual abstraction
+as a process. Furthermore, we clarify how it relates to similar terms often used interchangeably in the
+field of visualization. Visual abstraction is characterized by a conceptual space where this process
+exists, by the purpose it should serve, and by the perceptual and cognitive qualities of the beholder.
+These characteristics can be used to control the process of visual abstraction to produce effective and
+informative visual representations.
+
+***
+
+The term abstraction often lacks a precise definition in many fields. While several fields have defined the term for their
+own purposes, there is only a vague understanding of its meaning that is shared by all fields. Some scientific disciplines
+and scholarly fields have adjusted the vaguely understood meaning to fit the needs of the respective discipline or field. In
+this article we first present our key definitions related to visual abstraction, and we then provide the justification for the
+definitions. 
+
+***
+
+
+An abstraction is a process that transforms a source thing into a less concrete sign thing of the source
+thing. Abstraction uses a concept of point-of-view, which determines which aspects of source thing should be preserved
+in its sign thing and which should be suppressed.
+
+***
+
+
+A data representation is a sign thing that stands in digital form for a referent thing from reality or another
+sign thing, using data structures or concept things. Similarly, a visual representation is a sign thing that stands for a
+referent from reality or another sign thing so that it can be visually perceived and cognitively processed by a human
+observer.
+
+***
+
+
+A visualization is a process that transforms data representations of a thing from reality into visual
+representations. Visualization is a process that is intended to be a meaningful visual abstraction process. The designers
+of visualization processes must understand the point-of-view component and tasks. Otherwise, they would not reach the
+full meaningfulness intended.
+
+***
+
+In computer science, the term abstraction achieves yet another flavor of its meaning. In object-oriented design, the
+most frequently used programming methodology, it primarily relates to the definition of classes and methods that
+cannot be instantiated. Typically, classes and methods are hierarchically grouped into increasingly abstract constructs
+such that implementations of particular functionality can be shared among many different elements. While for most
+of these classes it is possible to create instances, an abstract class is a construct that itself cannot be instantiated but
+which organizes the functionality into a comprehensive representation. The class hierarchy as the outcome of such
+abstraction gives a clear understanding of differences in functionality among various classes as well as what they have
+in common. It also facilitates further extensibility of existing code to support new cases that were not considered in the
+initial software design.
+
+***
+
+The intuitive understanding of abstraction has been reinforced by this brief excursion into various fields and that stand
+and argue for abstraction. We can observe that the term is not used uniformly and that it is frequently exchanged
+with other terms. The recurrent pattern is that abstraction relates to formation of some higher-order constructs or
+representations that are result of a transformation of lower-level entities. The lowest entities are more tangible, while
+the higher levels of the abstraction hierarchy are further removed from tangibility and become more mental constructs
+and concepts  that, in one way or another, allow humans to recognize certain
+characteristics clearer than the lower-level representations. The ability to abstract seems to be one of the core properties
+of humans, present while shaping the entire body of analytical knowledge humankind has formed throughout our
+history.
+

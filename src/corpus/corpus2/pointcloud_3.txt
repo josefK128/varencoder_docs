@@ -1,0 +1,21 @@
+$$$Point cloud ridge-valley feature enhancement
+based on position and normal guidance
+$$$https://arxiv.org/ftp/arxiv/papers/1910/1910.04942.pdf
+
+
+Given a point cloud our algorithm is able to recognize multiscale ridge-valley features by judging the distance from the current point to the
+curvature extreme point. At the same time, it can effectively enhance features by the position and normal constraints. Different forms of the constraint
+can produce different enhancement effects, such as maintaining the original features as much as possible or creating sharper features 
+
+***
+
+Ridge-valley features are important elements in point clouds that can intuitively sketch the basic shape of objects. These features have important applications in fields including surface reconstruction , surface editing, visual perception and
+multi-perspective data registering. In general, point clouds are obtained by digitizing real objects with vision measuring equipment. During this process, factors such as object surface reflection and sensor quantization error will affect the accuracy of the data
+acquisition and weaken the sharpness of the original features. In addition, subsequent processing, such as resampling and smooth
+filtering, may further damage these features. The effective recognition and enhancement of ridge-valley features are important topics in point cloud processing.
+
+***
+
+the main contributions of this paper are as follows. A
+simple and effective ridge-valley point. A parametric surface to fit variations of local surface. The use of extreme point distance criterion to determine feature points. 
+

@@ -1,0 +1,23 @@
+$$$Neural Tutle Graphics
+$$$https://arxiv.org/pdf/1910.02055.pdf
+
+
+We propose Neural Turtle Graphics, a novel generative model for spatial graphs, and demonstrate its applications in modeling city road layouts. Specifically, we
+represent the road layout using a graph where nodes in the
+graph represent control points and edges in the graph represents road segments. Neural Turtle graphics is a sequential generative model
+parameterized by a neural network. It iteratively generates
+a new node and an edge connecting to an existing node conditioned on the current graph.
+
+***
+
+City road layout modeling is an important problem with
+applications in various fields. In urban planning, extensive
+simulation of city layouts are required for ensuring that the
+final construction leads to effective traffic flow and connectivity. 
+
+***
+
+Graph generation with
+neural networks has only recently gained attention uses an Recursive Neural network to generate a graph as a sequence
+of nodes sorted by breadth-first order. It also predicts edges to
+previous nodes as the new node is added. Producing valid geometry and topology makes our problem particularly challenging. 

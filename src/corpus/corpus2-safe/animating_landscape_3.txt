@@ -1,0 +1,32 @@
+$$$Animating Landscape: Self-Supervised Learning of Decoupled Motion and Appearance for Single-Image Video Synthesis
+$$$https://arxiv.org/pdf/1910.07192.pdf
+
+Automatic generation of a high-quality video from a single image remains a
+challenging task despite the recent advances in deep generative models. This
+paper proposes a method that can create a high-resolution, long-term animation using convolutional neural networks (CNNs) from a single landscape
+image where we mainly focus on skies and waters. Our key observation
+is that the motion (moving clouds) and appearance (time-varying
+colors in the sky) in natural scenes have different time scales. We thus
+learn them separately and predict them with decoupled control while handling future uncertainty in both predictions by introducing latent codes.
+
+***
+
+Unlike previous methods that infer output frames directly, our CNNs predict
+spatially-smooth intermediate data, for motion, flow fields for warping,
+and for appearance, color transfer maps, via self-supervised learning,
+without explicitly-provided ground truth. These intermediate data are applied not to each previous output frame, but to the input image only once
+for each output frame. This design is crucial to alleviate error accumulation in long-term predictions, which is the essential problem in previous
+recurrent approaches. The output frames can be looped like cinemagraph,
+and also be controlled directly by specifying latent codes or indirectly via
+visual annotations. 
+
+***
+
+To combat the uncertainty of future prediction, we also extract
+latent codes both for motion and appearance, which depict potential
+future variations and enable the learning of one-to-many mappings.
+The user can manipulate the latent codes to control the motion and
+appearance smoothly in the latent space. Note that the backward
+flow fields, color transfer functions, and latent codes are learned in
+a self-supervised manner because their ground-truth data are not available in general.
+

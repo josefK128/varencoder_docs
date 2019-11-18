@@ -1,0 +1,49 @@
+$$$Visual Indeterminacy
+$$$https://arxiv.org/pdf/1910.04639.pdf
+
+
+GAN art often exhibits
+visual indeterminacy. GANs cause visual indeterminacy by creating
+plausible compositions and textures that nonetheless defy coherent explanation, and these are the
+GAN images often used in recent artworks. Because visual indeterminacy can be understood as a
+perceptual process, GANs provide a potential tool for both art and for neuroscience experiments
+based on perceptual uncertainty modeling.
+
+***
+
+Often, the initial appearance of an image invites the viewer to investigate further, but the image
+confounds explanation. For some images, this investigation leads to an “Aha!” moment, where the
+viewer understands the structure of an image. They see a vivid 3D object where there had
+been abstract 2D shapes. This moment is pleasurable because the posterior distribution collapses.
+Some understanding has been gained. But the image may also become less interesting as result.
+
+***
+
+Natural image models, vision neuroscience, and image synthesis have long been tightly-coupled
+fields. Discoveries about the visual cortex led to natural image statistics analysis, which
+led to texture synthesis algorithms which led to style transfer algorithms. At the same
+time, cortical modeling also led to deep convolution networks, which led to GANs and trained
+discriminative networks, which, in turn, have led to improved neuroscience models. Can aspects
+of aesthetic experience be understood with the same models?
+
+***
+
+Ideally, a generator would accurately represent a distribution over natural images; a recognition
+model would be the inverse, providing a posterior distribution over interpretations that would
+approximate human perceptual uncertainty. Optimization against this model would give artists more
+precise control over the type of perceptual uncertainty present in images, for example, to produce
+images with specific types of visual indeterminacy.
+
+***
+
+This would provide artists with higher-level controls to explore artistic creation. It could also provide
+a richer testbed to develop perceptual theories of aesthetic experience, rather than using hand-crafted
+artwork.
+
+***
+
+A more fine-grained neural model of indeterminacy is needed, to account for the temporal evolution
+from first impressions [14], to the movement of attention, to the possibility of the “Aha!” moment.
+Moreover, the categorization of perceptual ambiguity in art is very preliminary and much work
+remains to be done to expand upon and refine it.
+

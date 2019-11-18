@@ -1,0 +1,23 @@
+$$$Cubic Stylization
+$$$https://arxiv.org/pdf/1910.02926.pdf
+
+We present a 3D stylization algorithm that can turn an input shape into
+the style of a cube while maintaining the content of the original shape. 
+The key insight is that cubic style sculptures can be captured by the as rigid as possible energy with a regularization on rotated surface normals.
+Minimizing this energy naturally leads to a detail preserving cubic geometry.
+Our optimization can be solved efficiently without any mesh surgery. Our
+method serves as a non-realistic modeling tool where one can incorporate
+many artistic controls to create stylized geometries.
+
+***
+
+The availability of image stylization filters and non-photorealistic
+rendering techniques has dramatically lowered the barrier of creating artistic imagery to the point that even a non-professional user
+can easily create stylized images. In stark contrast, direct stylization of 3D shapes or non-realistic modeling has received far less
+attention. In professional industries such as visual effects and video
+games, trained modelers are still required to meticulously create
+non-realistic geometric assets. This is because investigating geometric styles is more challenging due to arbitrary topologies, curved
+metrics, and non-uniform discretization. The scarcity of tools to
+generate artistic geometry remains a major roadblock to the development of geometric stylization.
+
+

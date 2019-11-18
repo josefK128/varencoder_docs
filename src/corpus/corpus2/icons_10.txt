@@ -1,0 +1,75 @@
+$$$Adversarial Colorization
+$$$https://arxiv.org/pdf/1910.05253.pdf
+
+We present a system to help designers create icons that are widely
+used in banners, signboards, billboards, homepages, and mobile
+apps. Designers are tasked with drawing contours, whereas our system colorizes contours in different styles. This goal is achieved by
+training a dual conditional generative adversarial network (GAN)
+on our collected icon dataset.
+
+***
+
+One condition requires the generated
+image and the drawn contour to possess a similar contour, while
+the other anticipates the image and the referenced icon to be similar
+in color style. Accordingly, the generator takes a contour image
+and a man-made icon image to colorize the contour, and then the
+discriminators determine whether the result fulfills the two conditions. 
+
+***
+
+. The trained network is able to colorize icons demanded by
+designers and greatly reduces their workload. For the evaluation,
+we compared our dual conditional GAN to several state-of-the-art
+techniques. Experiment results demonstrate that our network is
+over the previous networks. 
+
+***
+
+Nowadays, icons are widely utilized in banners, signboards, billboards, homepages, and mobile apps. Effective icons are usually
+simple but distinguishable, so that users can quickly receive the
+intended information when seeing them at a small size or a long
+distance. 
+
+***
+
+Considering aesthetics and practical issues, designing an
+eye-catching icon is challenging. Designers have to carefully consider not only shapes and structures, but also colors, when they
+create icons for their customers. 
+
+***
+
+Generative adversarial networks (GANs) have been proven
+to be able to generate realistic images in many applications and could constitute a solution to help designers
+colorize icons. Specifically, a network takes a contour image drawn
+by the designers as input and then outputs the colorized icon image.
+
+***
+
+To control the colorization process, additional inputs, such as stroke colors
+and style images, are fed into the network as well. The features
+extracted from both contour and style images will be fused and
+used for the colorization. 
+
+***
+
+Observing that an icon can be well defined by color and structure conditions, we present a dual conditional GAN to
+colorize icons. Rather than training a discriminator to recognize
+whether an icon is man-made or machine-generated, we train two
+discriminators to determine whether paired images are similar in
+structure and color
+
+***
+
+We represent the structure condition by a binary contour image.
+White and black pixels in the image indicate edge and non-edge
+regions, respectively. To obtain this contour image, the Canny edge
+detection algorithm is adopted. Intuitively, each icon and its corresponding contour can match, and otherwise cannot.
+
+***
+
+Since applying a referenced icon to specify the color condition is not
+intuitive, we let users simply select a style label when using our system to create icons. Specifically, we consider the color psychology
+theory and define the style of a man-made icon according to its
+color combination.
+
