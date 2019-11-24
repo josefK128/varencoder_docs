@@ -68,8 +68,8 @@ def action(diagnostics=False):
     for k,paragraph in _docs.items():
         a = []
         for sentence in paragraph:
-            sentence += sentence.lower()          #lower case
-            wordlist = word_tokenize(sentence)
+            sentence += sentence.lower()        #lower case
+            wordlist = word_tokenize(sentence)  #[2]tokenize ea se`nt in ea pgph
  
             #[3]filter out stopwords
             wordlist = [word for word in wordlist if word not in stop_words]

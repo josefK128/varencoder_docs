@@ -1,6 +1,6 @@
 # corpus2sentences.py
 # reads corpus and builds dictionary {doc-index:[doc-sentences],...} 
-# returns dictionary 
+# returns dictionary docs 
 
 
 import os

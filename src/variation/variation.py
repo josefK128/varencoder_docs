@@ -64,9 +64,10 @@ def action(U, map, prob = 1.0, diagnostics = False):
                     if diagnostics == True:
                         print('adding rw = ' + str(rw) + ' to rows')
                     rows.append(rw)
-            tree = spatial.KDTree(rows)
+            tree = spatial.KDTree(rows)  #spatial imported from scipy
+                                  #KDTree is data struct for k-matches search
 
-            da, idxa = tree.query(U[i], nchoices)
+            da, idxa = tree.query(U[i], nchoices)  #query KDTree - best matches
 #            for j in range(nchoices):
 #                print('idxa[' + str(j) + '] = ' + str(idxa[j]))
 #                print('da[' + str(j) + '] = ' + str(da[j]))

@@ -43,7 +43,7 @@ def action(diagnostics=False):
     if nargs == 1:
         corpusname = sys.argv[1] 
     else:
-        print('to many command line args!')
+        print('too many command line args!')
         print('usage is  src>py vae.py [corpusname [prob]]')
         print('using corpusname = corpus0 and prob = 1.0')
 
