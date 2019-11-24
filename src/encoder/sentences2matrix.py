@@ -1,7 +1,10 @@
 # sentences2matrix.py
-# obtains the _docs dictionary from filter_sentences
+# obtains the _docs dictionary and original docs dictionary from 
+# filter_sentences.py
 # build a document-term matrix A where documents are the sentences in the corpus
-# returns A
+# and terms are the Tf-Idf (term-frequency-inverse document frequency) of
+# all stemmed and filtered words in the sentences.
+# returns A and the original docs dictionary to encoder.py 
 
 
 import pandas as pd

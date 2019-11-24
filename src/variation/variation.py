@@ -1,5 +1,10 @@
 # variation.py
 # Given a matrix U for each row r find the nearest k(=1) row(s) to r
+# A KD-Tree is formed and the best (nearest in meaning) nchoices are selected
+# and the first not previously used vector is used as the match. If all nchoice
+# vectors have been used a random choiice is made from the nchoices vectors.
+# A dictionary mapping each original sentence index to its permuted (selected)
+# index (permutations) is returned to vae.py
 
 
 import numpy as np

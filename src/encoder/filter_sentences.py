@@ -1,9 +1,11 @@
 # filter_sentences.py
-# obtains the docs dictionary from corpus2sentences
-# for each sentence in docs filters out punctuation, stopwords
-# tokenizes each sentence to a list of its words
-# stems the words and re-joins the word-lists to sentence-strings in _docs
-# returns the modified _docs dictionary (leading underscore => preprocessed) 
+# obtains the docs dictionary from corpus2sentences.py
+# For each sentence in docs, filters out punctuation and stopwords,
+# tokenizes each sentence to a list of its words,
+# stems the words and re-joins the word-lists to sentence-strings in a new
+# dictionary _docs (leading underscore => preprocessed) 
+# filter_sentences returns the  _docs dictionary to sentences2matrix.py,
+# along with the original dictionary docs obtained from corpus2sentences.py
 
 
 import string

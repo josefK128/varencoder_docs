@@ -1,9 +1,12 @@
 # encoder.py
-# obtains doc-term matrix A from sentences2matrix
-# performs Singular Value Decomposition on A to produce U*S*Vt
+# obtains doc-term matrix A from sentences2matrix and also the docs dictionary
+# created by corpus2sentencs.py (and passed upward to filter_sentences.py
+# and sentences2matrix.py (which returns docs to encode)
+# encoder.py performs Singular Value Decomposition on A to produce U*S*Vt
 # U is the semantic feature space for the rows of A associated with all
 # sentences in the corpus
-# returns the semantic features matrix U
+# returns the semantic features matrix U, and the docs dictionary passed in
+# by sentences2matrix.py
 
 
 import numpy as np

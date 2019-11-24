@@ -1,6 +1,9 @@
 # decoder.py
-#receives the map - sentences indices to doc index and sentence in 
-#doc-sentences-array
+# receives the map - sentences indices to doc index and sentence in 
+# doc-sentences-array, permutations dictionary (from variations.py) and the
+# original dictionary of document indexed sentences.
+# decoder produces a dictionary sentences_ indexed the same as sentences but 
+# whose values are the permuted sentences.
 
 
 import numpy as np
