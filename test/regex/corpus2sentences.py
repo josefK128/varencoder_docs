@@ -38,10 +38,13 @@ def filter(regex, replace, s_pf, diagnostics=False):
 
 def action(diagnostics=False):
     #relative location of corpus relative to main file 
-    if diagnostics == True:
-        basepath = dbasepath + corpusname +'/'   #relative to /encoder
-    else:
-        basepath = vbasepath + corpusname + '/'   #relative to vae.py
+
+# !!!! change to original !!!!
+#    if diagnostics == True:
+#        basepath = dbasepath + corpusname +'/'   #relative to /encoder
+#    else:
+#        basepath = vbasepath + corpusname + '/'   #relative to vae.py
+    basepath = vbasepath + corpusname + '/'   #relative to vae.py
     
 
     print('\n+++++++++++ corpus2sentences +++++++++++++++++++++')
@@ -91,7 +94,7 @@ def action(diagnostics=False):
             print('%%%%%%%%%')
             print('docs ' + str(index) + ' is ' + str(docs[index]))
     else:
-        print('\nnumber of paragraphs extracted = ' + str(len(docs.values())))
+        print('number of paragraphs extracted = ' + str(len(docs.values())))
         for k,v in docs.items():
             print('paragraph ' + str(k) + ' has ' + str(len(v)) + ' sentences')
 
