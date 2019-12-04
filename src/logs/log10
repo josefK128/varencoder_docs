@@ -1,0 +1,325 @@
+# log10
++++++++++++ variation +++++++++++++++++++++
+U = [[-0.06112689  0.25095267 -0.25831726 ...  0.44501247 -0.28264126
+   0.25753056]
+ [-0.06030036  0.25644539  0.04523903 ... -0.00833771 -0.01255884
+   0.02832723]
+ [-0.02837067  0.13189432  0.11164062 ... -0.01525133  0.0672941
+  -0.12018291]
+ ...
+ [-0.12758215  0.08893344  0.28969488 ...  0.02373838 -0.05950926
+  -0.009155  ]
+ [-0.02013286  0.03909095  0.08990325 ... -0.00364072  0.02363278
+  -0.00318887]
+ [-0.07606183  0.18145819  0.27747491 ...  0.09202956  0.05572823
+  -0.0651502 ]]
+map = {0: [0, 0], 1: [0, 1], 2: [0, 2], 3: [0, 3], 4: [0, 4], 5: [1, 0], 6: [1, 1], 7: [1, 2], 8: [1, 3], 9: [1, 4], 10: [2, 0], 11: [2, 1], 12: [2, 2], 13: [3, 0], 14: [3, 1], 15: [3, 2], 16: [3, 3], 17: [4, 0], 18: [4, 1], 19: [5, 0], 20: [5, 1], 21: [5, 2], 22: [6, 0], 23: [6, 1], 24: [6, 2], 25: [6, 3], 26: [6, 4], 27: [6, 5], 28: [7, 0], 29: [7, 1], 30: [7, 2], 31: [7, 3], 32: [8, 0], 33: [8, 1], 34: [8, 2], 35: [8, 3], 36: [8, 4], 37: [9, 0], 38: [9, 1], 39: [9, 2], 40: [9, 3], 41: [9, 4]}
+prob = 1.0
+diagnostics = False
+
+***while i < len(map)
+i = 0 len(map) = 42
+
+&&&while tuple[0] == n   n = 0
+n = 0 permutations[0 = [19, 1.4142135623730951]
+i incremented is now 1
+
+&&&while tuple[0] == n   n = 0
+n = 0 permutations[1 = [26, 1.4142135623730938]
+i incremented is now 2
+
+&&&while tuple[0] == n   n = 0
+n = 0 permutations[2 = [29, 1.4142135623730945]
+i incremented is now 3
+
+&&&while tuple[0] == n   n = 0
+n = 0 permutations[3 = [1, 1.4142135623730945]
+i incremented is now 4
+
+&&&while tuple[0] == n   n = 0
+n = 0 permutations[4 = [7, 1.4142135623730945]
+i incremented is now 5
+
+&&& tuple[0] != n tuple[0] = 1 n = 0
+
+%%%%%%%%%% n incremented is now 1 i = 5
+
+***while i < len(map)
+i = 5 len(map) = 42
+
+&&&while tuple[0] == n   n = 1
+n = 1 permutations[5 = [6, 1.4142135623730945]
+i incremented is now 6
+
+&&&while tuple[0] == n   n = 1
+n = 1 permutations[6 = [26, 1.4142135623730943]
+i incremented is now 7
+
+&&&while tuple[0] == n   n = 1
+n = 1 permutations[7 = [25, 1.4142135623730943]
+i incremented is now 8
+
+&&&while tuple[0] == n   n = 1
+n = 1 permutations[8 = [15, 1.4142135623730945]
+i incremented is now 9
+
+&&&while tuple[0] == n   n = 1
+n = 1 permutations[9 = [14, 1.4142135623730943]
+i incremented is now 10
+
+&&& tuple[0] != n tuple[0] = 2 n = 1
+
+%%%%%%%%%% n incremented is now 2 i = 10
+
+***while i < len(map)
+i = 10 len(map) = 42
+
+&&&while tuple[0] == n   n = 2
+n = 2 permutations[10 = [26, 1.4142135623730947]
+i incremented is now 11
+
+&&&while tuple[0] == n   n = 2
+n = 2 permutations[11 = [7, 1.4142135623730945]
+i incremented is now 12
+
+&&&while tuple[0] == n   n = 2
+n = 2 permutations[12 = [35, 1.4142135623730945]
+i incremented is now 13
+
+&&& tuple[0] != n tuple[0] = 3 n = 2
+
+%%%%%%%%%% n incremented is now 3 i = 13
+
+***while i < len(map)
+i = 13 len(map) = 42
+
+&&&while tuple[0] == n   n = 3
+n = 3 permutations[13 = [26, 1.4142135623730945]
+i incremented is now 14
+
+&&&while tuple[0] == n   n = 3
+n = 3 permutations[14 = [9, 1.4142135623730943]
+i incremented is now 15
+
+&&&while tuple[0] == n   n = 3
+n = 3 permutations[15 = [1, 1.4142135623730945]
+i incremented is now 16
+
+&&&while tuple[0] == n   n = 3
+n = 3 permutations[16 = [15, 1.4142135623730945]
+i incremented is now 17
+
+&&& tuple[0] != n tuple[0] = 4 n = 3
+
+%%%%%%%%%% n incremented is now 4 i = 17
+
+***while i < len(map)
+i = 17 len(map) = 42
+
+&&&while tuple[0] == n   n = 4
+n = 4 permutations[17 = [9, 1.4142135623730943]
+i incremented is now 18
+
+&&&while tuple[0] == n   n = 4
+n = 4 permutations[18 = [26, 1.414213562373094]
+i incremented is now 19
+
+&&& tuple[0] != n tuple[0] = 5 n = 4
+
+%%%%%%%%%% n incremented is now 5 i = 19
+
+***while i < len(map)
+i = 19 len(map) = 42
+
+&&&while tuple[0] == n   n = 5
+n = 5 permutations[19 = [26, 1.4142135623730945]
+i incremented is now 20
+
+&&&while tuple[0] == n   n = 5
+n = 5 permutations[20 = [1, 1.4142135623730945]
+i incremented is now 21
+
+&&&while tuple[0] == n   n = 5
+n = 5 permutations[21 = [35, 1.4142135623730945]
+i incremented is now 22
+
+&&& tuple[0] != n tuple[0] = 6 n = 5
+
+%%%%%%%%%% n incremented is now 6 i = 22
+
+***while i < len(map)
+i = 22 len(map) = 42
+
+&&&while tuple[0] == n   n = 6
+n = 6 permutations[22 = [2, 1.4142135623730945]
+i incremented is now 23
+
+&&&while tuple[0] == n   n = 6
+n = 6 permutations[23 = [18, 1.4142135623730943]
+i incremented is now 24
+
+&&&while tuple[0] == n   n = 6
+n = 6 permutations[24 = [1, 1.4142135623730945]
+i incremented is now 25
+
+&&&while tuple[0] == n   n = 6
+n = 6 permutations[25 = [7, 1.4142135623730943]
+i incremented is now 26
+
+&&&while tuple[0] == n   n = 6
+n = 6 permutations[26 = [9, 1.414213562373094]
+i incremented is now 27
+
+&&&while tuple[0] == n   n = 6
+n = 6 permutations[27 = [26, 1.4142135623730945]
+i incremented is now 28
+
+&&& tuple[0] != n tuple[0] = 7 n = 6
+
+%%%%%%%%%% n incremented is now 7 i = 28
+
+***while i < len(map)
+i = 28 len(map) = 42
+
+&&&while tuple[0] == n   n = 7
+n = 7 permutations[28 = [26, 1.414213562373094]
+i incremented is now 29
+
+&&&while tuple[0] == n   n = 7
+n = 7 permutations[29 = [2, 1.4142135623730945]
+i incremented is now 30
+
+&&&while tuple[0] == n   n = 7
+n = 7 permutations[30 = [17, 1.4142135623730945]
+i incremented is now 31
+
+&&&while tuple[0] == n   n = 7
+n = 7 permutations[31 = [1, 1.4142135623730945]
+i incremented is now 32
+
+&&& tuple[0] != n tuple[0] = 8 n = 7
+
+%%%%%%%%%% n incremented is now 8 i = 32
+
+***while i < len(map)
+i = 32 len(map) = 42
+
+&&&while tuple[0] == n   n = 8
+n = 8 permutations[32 = [26, 1.4142135623730943]
+i incremented is now 33
+
+&&&while tuple[0] == n   n = 8
+n = 8 permutations[33 = [25, 1.4142135623730943]
+i incremented is now 34
+
+&&&while tuple[0] == n   n = 8
+n = 8 permutations[34 = [33, 1.4142135623730943]
+i incremented is now 35
+
+&&&while tuple[0] == n   n = 8
+n = 8 permutations[35 = [1, 1.4142135623730945]
+i incremented is now 36
+
+&&&while tuple[0] == n   n = 8
+n = 8 permutations[36 = [32, 1.4142135623730945]
+i incremented is now 37
+
+&&& tuple[0] != n tuple[0] = 9 n = 8
+
+%%%%%%%%%% n incremented is now 9 i = 37
+
+***while i < len(map)
+i = 37 len(map) = 42
+
+&&&while tuple[0] == n   n = 9
+n = 9 permutations[37 = [1, 1.4142135623730943]
+i incremented is now 38
+
+&&&while tuple[0] == n   n = 9
+n = 9 permutations[38 = [33, 1.4142135623730943]
+i incremented is now 39
+
+&&&while tuple[0] == n   n = 9
+n = 9 permutations[39 = [18, 1.4142135623730945]
+i incremented is now 40
+
+&&&while tuple[0] == n   n = 9
+n = 9 permutations[40 = [32, 1.4142135623730945]
+i incremented is now 41
+
+&&&while tuple[0] == n   n = 9
+n = 9 permutations[41 = [26, 1.4142135623730943]
+i incremented is now 42
+
+&&& tuple[0] != n tuple[0] = 9 n = 9
+
+%%%%%%%%%% n incremented is now 10 i = 42
+
+
++++++++++++ vae +++++++++++++++++++++
+permutations:
+{0: [19, 1.4142135623730951], 1: [26, 1.4142135623730938], 2: [29, 1.4142135623730945], 3: [1, 1.4142135623730945], 4: [7, 1.4142135623730945], 5: [6, 1.4142135623730945], 6: [26, 1.4142135623730943], 7: [25, 1.4142135623730943], 8: [15, 1.4142135623730945], 9: [14, 1.4142135623730943], 10: [26, 1.4142135623730947], 11: [7, 1.4142135623730945], 12: [35, 1.4142135623730945], 13: [26, 1.4142135623730945], 14: [9, 1.4142135623730943], 15: [1, 1.4142135623730945], 16: [15, 1.4142135623730945], 17: [9, 1.4142135623730943], 18: [26, 1.414213562373094], 19: [26, 1.4142135623730945], 20: [1, 1.4142135623730945], 21: [35, 1.4142135623730945], 22: [2, 1.4142135623730945], 23: [18, 1.4142135623730943], 24: [1, 1.4142135623730945], 25: [7, 1.4142135623730943], 26: [9, 1.414213562373094], 27: [26, 1.4142135623730945], 28: [26, 1.414213562373094], 29: [2, 1.4142135623730945], 30: [17, 1.4142135623730945], 31: [1, 1.4142135623730945], 32: [26, 1.4142135623730943], 33: [25, 1.4142135623730943], 34: [33, 1.4142135623730943], 35: [1, 1.4142135623730945], 36: [32, 1.4142135623730945], 37: [1, 1.4142135623730943], 38: [33, 1.4142135623730943], 39: [18, 1.4142135623730945], 40: [32, 1.4142135623730945], 41: [26, 1.4142135623730943]}
+
+
+sentences_:
+{0: 'based on position and normal guidance Given a point cloud our algorithm is able to recognize multiscale ridge-valley features by judging the distance from the current point to the curvature extreme point', 1: 'In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features', 2: 'A simple and effective ridge-valley point', 3: 'It is a pictorial game consisting of interactive rounds of creation between artists and a machine', 4: 'Recently, GANs put a spotlight on the creative power of neural networks', 5: 'Hence art creation could benefit of new tools while simultaneously supporting thoughts of how these interactions are affecting humans', 6: 'In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features', 7: 'During this process, factors such as object surface reflection and sensor quantization error will affect the accuracy of the data acquisition and weaken the sharpness of the original features', 8: 'Our installation where the machine projects completions without painting, combined with generative network capability, allows to explore that in a principled way', 9: 'Actually, some painters have expressed how evocative unintended strokes could be', 10: 'In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features', 11: 'Recently, GANs put a spotlight on the creative power of neural networks', 12: 'Our optimization can be solved efficiently without any mesh surgery', 13: 'In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features', 14: 'Yet in these, humans are either engineers or curators', 15: 'It is a pictorial game consisting of interactive rounds of creation between artists and a machine', 16: 'Our installation where the machine projects completions without painting, combined with generative network capability, allows to explore that in a principled way', 17: 'Yet in these, humans are either engineers or curators', 18: 'In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features', 19: 'In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features', 20: 'It is a pictorial game consisting of interactive rounds of creation between artists and a machine', 21: 'Our optimization can be solved efficiently without any mesh surgery', 22: 'They repetitively paint one after the other', 23: 'As such, the interaction is not innocuous, even though, contrarily to our daily experience, we have made the machine impact as explicit as possible with its recognizable blue contributions', 24: 'It is a pictorial game consisting of interactive rounds of creation between artists and a machine', 25: 'Recently, GANs put a spotlight on the creative power of neural networks', 26: 'Yet in these, humans are either engineers or curators', 27: 'In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features', 28: 'In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features', 29: 'They repetitively paint one after the other', 30: 'From an outside perspective, the machine distorts their original painting style, both on the short term artworks resulting from their interaction (see Figure 2), and on their long term body of work as it inspired them on their machine-free paintings', 31: 'It is a pictorial game consisting of interactive rounds of creation between artists and a machine', 32: 'In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features', 33: 'During this process, factors such as object surface reflection and sensor quantization error will affect the accuracy of the data acquisition and weaken the sharpness of the original features', 34: 'The key insight is that cubic style sculptures can be captured by the as rigid as possible energy with a regularization on rotated surface normals', 35: 'It is a pictorial game consisting of interactive rounds of creation between artists and a machine', 36: 'We present a 3D stylization algorithm that can turn an input shape into the style of a cube while maintaining the content of the original shape', 37: 'It is a pictorial game consisting of interactive rounds of creation between artists and a machine', 38: 'The key insight is that cubic style sculptures can be captured by the as rigid as possible energy with a regularization on rotated surface normals', 39: 'As such, the interaction is not innocuous, even though, contrarily to our daily experience, we have made the machine impact as explicit as possible with its recognizable blue contributions', 40: 'We present a 3D stylization algorithm that can turn an input shape into the style of a cube while maintaining the content of the original shape', 41: 'In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features'}
+
+
+
+
+original docs:
+docs[0] = We propose a new form of human-machine interaction. It is a pictorial game consisting of interactive rounds of creation between artists and a machine. They repetitively paint one after the other. At its rounds, the computer partially completes the drawing using machine learning algorithms, and projects its additions directly on the canvas, which the artists are free to insert or modify. Alongside fostering creativity, the process is designed to question the growing interaction between humans and machines. 
+
+docs[1] = With the on-going technological revolution, the human-machine interaction is deeply evolving. Hence art creation could benefit of new tools while simultaneously supporting thoughts of how these interactions are affecting humans. Recently, GANs put a spotlight on the creative power of neural networks. For instance were able to generate aesthetic full-stack painting. Yet in these, humans are either engineers or curators. 
+
+docs[2] = In this work, we propose a new utilisation of the machine, integrating it at the core of a human creative process. The idea is to suggest to humans, while painting, ramifications and directions of their on-going artwork. In the following, we approach this generic idea under a specific interactive framework. 
+
+docs[3] = The artists found the machine strokes surprising and suggestive of move they would not have done by themselves. Actually, some painters have expressed how evocative unintended strokes could be. Our installation where the machine projects completions without painting, combined with generative network capability, allows to explore that in a principled way. Furthermore, the ability to change parameters, such as the learning data set or the amount of completion, adds more degree for the human to control their use of the machine. 
+
+docs[4] = From an outside perspective, the machine distorts their original painting style, both on the short term artworks resulting from their interaction (see Figure 2), and on their long term body of work as it inspired them on their machine-free paintings. As such, the interaction is not innocuous, even though, contrarily to our daily experience, we have made the machine impact as explicit as possible with its recognizable blue contributions. 
+
+docs[5] = based on position and normal guidance Given a point cloud our algorithm is able to recognize multiscale ridge-valley features by judging the distance from the current point to the curvature extreme point. At the same time, it can effectively enhance features by the position and normal constraints. Different forms of the constraint can produce different enhancement effects, such as maintaining the original features as much as possible or creating sharper features. 
+
+docs[6] = Ridge-valley features are important elements in point clouds that can intuitively sketch the basic shape of objects. These features have important applications in fields including surface reconstruction , surface editing, visual perception and multi-perspective data registering. In general, point clouds are obtained by digitizing real objects with vision measuring equipment. During this process, factors such as object surface reflection and sensor quantization error will affect the accuracy of the data acquisition and weaken the sharpness of the original features. In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features. The effective recognition and enhancement of ridge-valley features are important topics in point cloud processing. 
+
+docs[7] = the main contributions of this paper are as follows. A simple and effective ridge-valley point. A parametric surface to fit variations of local surface. The use of extreme point distance criterion to determine feature points. 
+
+docs[8] = We present a 3D stylization algorithm that can turn an input shape into the style of a cube while maintaining the content of the original shape. The key insight is that cubic style sculptures can be captured by the as rigid as possible energy with a regularization on rotated surface normals. Minimizing this energy naturally leads to a detail preserving cubic geometry. Our optimization can be solved efficiently without any mesh surgery. Our method serves as a non-realistic modeling tool where one can incorporate many artistic controls to create stylized geometries. 
+
+docs[9] = The availability of image stylization filters and non-photorealistic rendering techniques has dramatically lowered the barrier of creating artistic imagery to the point that even a non-professional user can easily create stylized images. In stark contrast, direct stylization of 3D shapes or non-realistic modeling has received far less attention. In professional industries such as visual effects and video games, trained modelers are still required to meticulously create non-realistic geometric assets. This is because investigating geometric styles is more challenging due to arbitrary topologies, curved metrics, and non-uniform discretization. The scarcity of tools to generate artistic geometry remains a major roadblock to the development of geometric stylization. 
+
+
+
+generated docs_:
+docs_[0] = based on position and normal guidance Given a point cloud our algorithm is able to recognize multiscale ridge-valley features by judging the distance from the current point to the curvature extreme point. In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features. A simple and effective ridge-valley point. It is a pictorial game consisting of interactive rounds of creation between artists and a machine. Recently, GANs put a spotlight on the creative power of neural networks. 
+
+docs_[1] = Hence art creation could benefit of new tools while simultaneously supporting thoughts of how these interactions are affecting humans. In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features. During this process, factors such as object surface reflection and sensor quantization error will affect the accuracy of the data acquisition and weaken the sharpness of the original features. Our installation where the machine projects completions without painting, combined with generative network capability, allows to explore that in a principled way. Actually, some painters have expressed how evocative unintended strokes could be. 
+
+docs_[2] = In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features. Recently, GANs put a spotlight on the creative power of neural networks. Our optimization can be solved efficiently without any mesh surgery. 
+
+docs_[3] = In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features. Yet in these, humans are either engineers or curators. It is a pictorial game consisting of interactive rounds of creation between artists and a machine. Our installation where the machine projects completions without painting, combined with generative network capability, allows to explore that in a principled way. 
+
+docs_[4] = Yet in these, humans are either engineers or curators. In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features. 
+
+docs_[5] = In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features. It is a pictorial game consisting of interactive rounds of creation between artists and a machine. Our optimization can be solved efficiently without any mesh surgery. 
+
+docs_[6] = They repetitively paint one after the other. As such, the interaction is not innocuous, even though, contrarily to our daily experience, we have made the machine impact as explicit as possible with its recognizable blue contributions. It is a pictorial game consisting of interactive rounds of creation between artists and a machine. Recently, GANs put a spotlight on the creative power of neural networks. Yet in these, humans are either engineers or curators. In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features. 
+
+docs_[7] = In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features. They repetitively paint one after the other. From an outside perspective, the machine distorts their original painting style, both on the short term artworks resulting from their interaction (see Figure 2), and on their long term body of work as it inspired them on their machine-free paintings. It is a pictorial game consisting of interactive rounds of creation between artists and a machine. 
+
+docs_[8] = In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features. During this process, factors such as object surface reflection and sensor quantization error will affect the accuracy of the data acquisition and weaken the sharpness of the original features. The key insight is that cubic style sculptures can be captured by the as rigid as possible energy with a regularization on rotated surface normals. It is a pictorial game consisting of interactive rounds of creation between artists and a machine. We present a 3D stylization algorithm that can turn an input shape into the style of a cube while maintaining the content of the original shape. 
+
+docs_[9] = It is a pictorial game consisting of interactive rounds of creation between artists and a machine. The key insight is that cubic style sculptures can be captured by the as rigid as possible energy with a regularization on rotated surface normals. As such, the interaction is not innocuous, even though, contrarily to our daily experience, we have made the machine impact as explicit as possible with its recognizable blue contributions. We present a 3D stylization algorithm that can turn an input shape into the style of a cube while maintaining the content of the original shape. In addition, subsequent processing, such as resampling and smooth filtering, may further damage these features. 
+
+
+writing generated docs_ as ./corpusgen/corpus1/docs_1575480795.2623715.txt
+docs_[0] repeated sentences = []
+docs_[1] repeated sentences = []
+docs_[2] repeated sentences = []
+docs_[3] repeated sentences = []
+docs_[4] repeated sentences = []
+docs_[5] repeated sentences = []
+docs_[6] repeated sentences = []
+docs_[7] repeated sentences = []
+docs_[8] repeated sentences = []
+docs_[9] repeated sentences = []

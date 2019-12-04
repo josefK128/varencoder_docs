@@ -61,9 +61,18 @@ def action(diagnostics=False):
                         if not line.startswith('$'):
                             s += line.replace("\n"," ").lstrip()
 
-                    #filter each doc - eliminate i.e, e.g., A. Taylor
+
+                    #filter each doc: 
                     print('\nfiltering text ' + fn )
+
+                    #[1] eliminate i.e, e.g., A. Taylor
                     rs = '\s([a-z,A-Z]\.)+,*'
+                    regex = re.compile(rs)
+                    s_pf = s
+                    s = filter(regex, '', s_pf, diagnostics)
+                    
+                    #[1] eliminate citations of form [34] for example
+                    rs = '\[\d+\]'
                     regex = re.compile(rs)
                     s_pf = s
                     s = filter(regex, '', s_pf, diagnostics)
@@ -104,7 +113,7 @@ def action(diagnostics=False):
 
 if __name__ == "__main__": 
     print("corpus2sentences module running in diagnostics mode as __main__")
-    #action(True)
-    action(False)  #quick check of non-diagnostics output in diagnoistics mode
+    action(True)
+    #action(False)  #quick check of non-diagnostics output in diagnoistics mode
 else:
     print("corpus2sentences module imported")

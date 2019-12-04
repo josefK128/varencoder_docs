@@ -1,0 +1,78 @@
+# log05
++++++++++++ variation +++++++++++++++++++++
+U = [[-0.66746697  0.05519624  0.2324662  -0.70526639]
+ [-0.17901261  0.95356111 -0.13940226  0.19809773]
+ [-0.32473752 -0.19360245 -0.92568689 -0.01293904]
+ [-0.64574598 -0.22403724  0.26387546  0.68058003]]
+map = {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}
+prob = 1.0
+diagnostics = True
+
+***while i < len(map)
+i = 0 len(map) = 4
+
+&&&while tuple[0] == n   n = 0
+adding rw = [-0.17901261  0.95356111 -0.13940226  0.19809773] to rows
+adding rw = [-0.32473752 -0.19360245 -0.92568689 -0.01293904] to rows
+adding rw = [-0.64574598 -0.22403724  0.26387546  0.68058003] to rows
+i incremented is now 1
+
+&&&while tuple[0] == n   n = 0
+adding rw = [-0.66746697  0.05519624  0.2324662  -0.70526639] to rows
+adding rw = [-0.32473752 -0.19360245 -0.92568689 -0.01293904] to rows
+adding rw = [-0.64574598 -0.22403724  0.26387546  0.68058003] to rows
+i incremented is now 2
+
+&&& tuple[0] != n tuple[0] = 1 n = 0
+&&& n incremented is now 1 i = 2
+
+***while i < len(map)
+i = 2 len(map) = 4
+
+&&&while tuple[0] == n   n = 1
+adding rw = [-0.66746697  0.05519624  0.2324662  -0.70526639] to rows
+adding rw = [-0.17901261  0.95356111 -0.13940226  0.19809773] to rows
+adding rw = [-0.64574598 -0.22403724  0.26387546  0.68058003] to rows
+i incremented is now 3
+
+&&&while tuple[0] == n   n = 1
+adding rw = [-0.66746697  0.05519624  0.2324662  -0.70526639] to rows
+adding rw = [-0.17901261  0.95356111 -0.13940226  0.19809773] to rows
+adding rw = [-0.32473752 -0.19360245 -0.92568689 -0.01293904] to rows
+i incremented is now 4
+
+&&& tuple[0] != n tuple[0] = 1 n = 1
+&&& n incremented is now 2 i = 4
+
+
+permutations:
+{0: [1, 1.4142135623730947], 1: [3, 1.4142135623730945], 2: [0, 1.414213562373095], 3: [1, 1.4142135623730945]}
+
+
++++++++++++ vae +++++++++++++++++++++
+permutations:
+{0: [1, 1.4142135623730947], 1: [3, 1.4142135623730945], 2: [0, 1.414213562373095], 3: [1, 1.4142135623730945]}
+
+
+sentences_:
+{0: 'The key insight is that cubic style sculptures can be captured by the as rigid as possible energy with a regularization on rotated surface normals', 1: 'In stark contrast, direct stylization of  3D shapes or non-realistic modeling has received far less attention', 2: 'We present a 3D stylization algorithm that can turn an input shape into the style of a cube while maintaining the content of the original shape', 3: 'The key insight is that cubic style sculptures can be captured by the as rigid as possible energy with a regularization on rotated surface normals'}
+
+
+
+
+original docs:
+docs[0] = We present a 3D stylization algorithm that can turn an input shape into the style of a cube while maintaining the content of the original shape. The key insight is that cubic style sculptures can be captured by the as rigid as possible energy with a regularization on rotated surface normals. 
+
+docs[1] = The availability of image stylization filters and non-photorealistic rendering techniques has dramatically lowered the barrier of creating artistic  imagery to the point that even a non-professional user can easily create stylized images. In stark contrast, direct stylization of  3D shapes or non-realistic modeling has received far less attention. 
+
+
+
+generated docs_:
+docs_[0] = The key insight is that cubic style sculptures can be captured by the as rigid as possible energy with a regularization on rotated surface normals. In stark contrast, direct stylization of  3D shapes or non-realistic modeling has received far less attention. 
+
+docs_[1] = We present a 3D stylization algorithm that can turn an input shape into the style of a cube while maintaining the content of the original shape. The key insight is that cubic style sculptures can be captured by the as rigid as possible energy with a regularization on rotated surface normals. 
+
+
+writing generated docs_ as ./corpusgen/corpus0/docs_1575481701.1765258.txt
+docs_[0] repeated sentences = []
+docs_[1] repeated sentences = []

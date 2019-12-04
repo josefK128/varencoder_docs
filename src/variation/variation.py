@@ -41,6 +41,9 @@ def replace(prob, i, idx, d):
 def action(U, map, prob = 1.0, diagnostics = False):
 
     print('\n\n\n+++++++++++ variation +++++++++++++++++++++')
+    print('U = ' + str(U))
+    print('map = ' + str(map))
+
     #ensure prob is float and is in [0,1]
     if type(prob) == str:
         prob = float(prob)
@@ -51,16 +54,21 @@ def action(U, map, prob = 1.0, diagnostics = False):
     #permutations - i.e. replacements and associated semantic distances
     permutations = {}
     i = 0
-    nchoices = 4    #retrieve nchoices closest U-vectors
     n = 0           #doc-paragraph
+    nchoices = round(len(map)/4)    #retrieve nchoices closest U-vectors
+    if nchoices <= 1:
+        nchoices = len(map) 
 
     #filter repeating closest-semantic-d sentences in same paragraph-doc 
     while i < len(map):
-        indices_used = []
-        match_found = False
+        print('\n***while i < len(map)')
+        print('i = ' + str(i) + ' len(map) = ' + str(len(map)))
         tuple = map[i]
+        match_found = False
+        indices_used = []
 
         while tuple[0] == n:
+            print('\n&&&while tuple[0] == n   n = ' + str(n))
             #tree
             row = U[i]
             rows = []
@@ -78,37 +86,44 @@ def action(U, map, prob = 1.0, diagnostics = False):
 #                print('da[' + str(j) + '] = ' + str(da[j]))
 
             #choose idx of closest U-vector to U[i] not U[i] and not prev chosen
-            for k in range(nchoices):
-                if not idxa[k] in indices_used:
-                    if idxa[k] >= i:
-                        permutations[i] = replace(prob, i, idxa[k] + 1, da[k])
-                    else:
-                        permutations[i] = replace(prob, i, idxa[k], da[k])
-
-                    indices_used.append(idxa[k])
-                    match_found = True
-                    print('\nn = ' + str(n) + ' permutations[' + str(i) + ' = ' + str(permutations[i]))
-                    break
+#            for k in range(nchoices):
+#                if not idxa[k] in indices_used:
+#                    if idxa[k] >= i:
+#                        permutations[i] = replace(prob, i, idxa[k] + 1, da[k])
+#                    else:
+#                        permutations[i] = replace(prob, i, idxa[k], da[k])
+#
+#                    indices_used.append(idxa[k])
+#                    match_found = True
+#                    #print('n = ' + str(n) + ' permutations[' + str(i) + ' = ' + str(permutations[i]))
+#                    break
     
             #if all len(idxa) matches are already used choose one at random
             if not match_found:
-                print('\n\n################################### random choice!')
-                m = np.rtandom.randint(nchoices)
+                print('\n################################ random choice!')
+                m = np.random.randint(nchoices-1)
+                if idxa[m] in indices_used:
+                    m = np.random.randint(nchoices-1) #choose again
                 if idxa[m] >= i:
                     permutations[i] = replace(prob, i, idxa[m] + 1, da[m])
                 else:
                     permutations[i] = replace(prob, i, idxa[m], da[m])
-                match_found = True
+                indices_used.append(idxa[m])
+                #print('n = ' + str(n) + ' permutations[' + str(i) + ' = ' + str(permutations[i]))
     
+
             i += 1
-            print('variation: i incremented is now ' + str(i))
+            print('i incremented is now ' + str(i))
             if i == len(map):
                 break
             else:
                 tuple = map[i]  #[n, sentence-index j]
 
+        print('\n&&& tuple[0] != n tuple[0] = ' + str(tuple[0]) + ' n = ' + str(n))
         n += 1
-        print('\n\n\n\nvariation: n incremented is now ' + str(n) + ' i = ' + str(i))
+        match_found = False
+        indices_used = []
+        print('&&& n incremented is now ' + str(n) + ' i = ' + str(i))
 
 
     if diagnostics == True:

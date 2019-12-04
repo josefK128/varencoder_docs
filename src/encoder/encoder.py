@@ -31,7 +31,7 @@ def action(diagnostics=False):
     print('U.shape is ' + str(U.shape));
     print('S.shape is ' + str(S.shape) + ' - diagonal of square matrix - non-diag els are zeroes');
     print('Vt.shape is ' + str(Vt.shape));
-    print('U is:\n')
+    print('U transpose is:\n')
     print(U.transpose())
  
     return U, docs

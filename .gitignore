@@ -15,7 +15,6 @@ npm-debug.log*
 .pnp.js
 
 # testing
-/logs
 /expt
 /p
 /coverage

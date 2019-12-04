@@ -26,7 +26,7 @@ basepath = './corpusgen/'
 
 def action(diagnostics=False):
   
-    #get corpusname from commandline (default = 'corpus0'
+    #get corpusname from commandline (default = 'corpus0')
     nargs = len(sys.argv) - 1
     position = 1
     while nargs >= position:
@@ -40,12 +40,13 @@ def action(diagnostics=False):
     if nargs == 2:
         corpusname = sys.argv[1] 
         prob = sys.argv[2]
-    if nargs == 1:
+    elif nargs == 1:
         corpusname = sys.argv[1] 
     else:
-        print('too many command line args!')
-        print('usage is  src>py vae.py [corpusname [prob]]')
-        print('using corpusname = corpus0 and prob = 1.0')
+        if nargs > 0:
+            print('too many command line args!')
+            print('usage is  src>py vae.py [corpusname [prob]]')
+            print('using corpusname = corpus0 and prob = 1.0')
 
 
     #set corpusname in corpus2sentences    
@@ -94,8 +95,8 @@ def action(diagnostics=False):
 
     #finalize docs_
     docs_ = {}
+    i = 0
     for k,a in docs.items():
-        i = 0
         docs_[k] = ''
         for j in a:
             docs_[k] += sentences_[i] + '. ' 
@@ -142,7 +143,8 @@ def action(diagnostics=False):
         f.close()
 
 
-    #check for repeats !!!!!
+    #check for repeats within each doc !!!!!
+    print('\n\nrepeated sentences in each generated document:')
     for idx,v in docs_.items():
         x = v.split('.')
         _size = len(x) 
@@ -155,9 +157,38 @@ def action(diagnostics=False):
         print('docs_[' + str(idx) + '] repeated sentences = ' + str(repeated)) 
 
 
+    #check for repeats across all docs !!!!!
+#    print('\n\nthere are ' + str(len(map)) + ' total sentences in the generatedcorpus')
+#    for i,s in sentences_.items():
+#        count = -1
+#        for j,t in sentences_.items():
+#            if int(j) >= int(i):
+#                if s == t:
+#                    count += 1
+#        print('sentence_ ' + str(i) + ' repeats ' + str(count) + ' times')     
+
+
+    #unique sentences in sentences_ - the generated corpus
+    unique = {}
+    for i,s in sentences_.items():
+        if not s in unique.values():
+            unique[i] = s
+
+    print('\n\nthere are ' + str(len(map)) + ' total sentences in the generated corpus')
+    print('there are ' + str(len(unique)) + ' unique sentences in the generated corpus')
+    for k,u in unique.items():
+        count = -1 
+        for j,t in sentences_.items():
+            if int(j) >= int(k):
+                if u == t:
+                    count += 1
+ 
+        print('unique sentence_ ' + str(k) + ' repeats ' + str(count) + ' times')        
+
 
 if __name__ == "__main__": 
-    print("\n\nvae module running as __main__")
+    print('\n\n+++++++++++ vae +++++++++++++++++++++')
+    print("vae module running as __main__")
     action(True)
 else:
     print("vae module imported")
