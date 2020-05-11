@@ -3,7 +3,7 @@ __README.md__
 * install python 3.X (current latest 3.8.X) - see 
   https://www.python.org/downloads/ - simply click download button and follow 
   defaults for installation
-* clone the repo - all the needed python application modules are in /srcx
+* clone the repo - all the needed python application modules are in /src
 * usage:  src> py vae.py [corpus2 [.5]]
   where first argument is corpus-name (corpus 0,1,2,3). Corpus0 (default) is a toy corpus
   of two texts each with two sentences intended just to show readable
