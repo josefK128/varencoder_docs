@@ -10,11 +10,19 @@ npm-debug.log*
 *.txt
 
 # dependencies
+/env
 /node_modules
 /.pnp
 .pnp.js
 
+# documentation
+/RFP
+/presentation
+/doc-term-matrix
+
 # testing
+/test
+/svd
 /expt
 /p
 /coverage

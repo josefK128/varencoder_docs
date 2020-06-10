@@ -1,0 +1,12 @@
+{
+    "msg": "\n     \n   \nThe Security Interest Group is a forum for vendors and developers to discuss\nthe state of standardization and development agendas for security technologies\nacross all the various venues for standardization.\n\nThe inaugural meeting is May 24th, to be held simultaneously 8AM-4PM PST at\nOracle in Redwood Shores, and 11AM-7PM at MIT/LCS with audio- and\nweb-conferencing.\n\nThis mailing list is public, though not publicized. Anyone may subscribe, and\na web-based archive is at http://www.w3.org/pub/WWW/Archives/Public/sig/ .\nSend the command \"subscribe [email]\" or \"unsubscribe [email]\" in the Subject\nline or body of a message to sig-request@w3.org.\n\nThanks,\nRohit Khare\n\n---\nRohit Khare -- 617/253-5884\nTechnical Staff, World Wide Web Consortium\nNE43-354, MIT LCS, Cambridge, MA 02139\n\n\n\n     \n   \nProposed Agenda:\n----------------\n7:30        Breakfast (Brunch)\n\n8-10        Introductions; top priority issues summary.\n\n10-10:30    Jeff Schiller, IETF Overview\n10:30-11    Jim Miller, W3C Overview\n11-11:30    [TBD: Burt Kaliski, PKCS Futures or SDSI]\n11:30-12:30 Roundtable: X.509v3 and CA stds issues\n\n12:30-1:30  Lunch (Snack)\n\n1:30-2:30   Proposed merger of priority lists\n2:30-3:30   Mapping tasks to fora and available resources\n3:30-4      Plotting next meeting, press release review\n\nHomework Questions:\n-------------------\nCompany representatives must be prepared to outline their top prioirty issues\nin the introduction sessions. Participants should also think through their\nbusiness requirements, technological needs, available resources, and\nappropriate fora for standardization.\n\nMore detailed guidelines will be sent out soon.\n\n\nWest Coast Site:\n----------------\nOracle Corporation\n200 Oracle Parkway, Box 659410\nRedwood Shores, CA  94065\nHost: Paul Lambert\nEmail: palamber@us.oracle.com\nPhone: (415) 506-0370\n\n\nEast Coast Site:\n----------------\nMIT/W3 Consortium\n545 Technology Square\nCambridge, MA 02139\nHost: Rohit Khare       (RSVPs REQUIRED!)\nEmail: khare@w3.org\nPhone: (617) 253-5884\n\n---\nRohit Khare -- 617/253-5884\nTechnical Staff, World Wide Web Consortium\nNE43-354, MIT LCS, Cambridge, MA 02139\n     \n   \n\n",
+    "receivers": [
+        " sig@w3.org\n",
+        " hal@mit.edu",
+        " timBL@w3.org",
+        " assist@w3.org\n"
+    ],
+    "sender": "\"khare@pest.w3.org\"\n",
+    "sent": "\"Fri, 17 May 96 17:14:26 -0400\"\n",
+    "subject": "\"May 24th Agenda\"\n"
+}

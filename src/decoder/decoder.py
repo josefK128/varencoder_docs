@@ -7,9 +7,10 @@
 
 
 import numpy as np
+from typing import List, Dict, Tuple
 
 
-def action(docs, map, permutations, diagnostics=False):
+def action(docs:Dict[int,List[str]], map:Dict[int,List[int]], permutations:Dict[int,List[float]], diagnostics:bool=False) -> Dict[int,str]:
 
     if diagnostics == True:
         print('\n\n+++++++++++ decoder +++++++++++++++++++++')
@@ -19,7 +20,7 @@ def action(docs, map, permutations, diagnostics=False):
     #and sentence is sentences[k]
     #below idx-d is the tuple associated with permutations key i, which is 
     #also the index of sentences
-    sentences_ = {}
+    sentences_:Dict[int,str] = {}
     for i,idx_d in permutations.items():   
         if diagnostics == True:
             print('\n\ni = ' + str(i) + ' idx_d = ' + str(idx_d))

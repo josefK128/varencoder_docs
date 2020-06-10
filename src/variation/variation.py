@@ -11,6 +11,7 @@ import numpy as np
 from numpy import random,argsort,sqrt
 from scipy import spatial
 from random import random
+from typing import Dict, List, Tuple
 
 
 #def distance(a, b):
@@ -25,7 +26,7 @@ from random import random
 #    return d
 
 
-def replace(prob, i, idx, d):
+def replace(prob:float, i:int, idx:int, d:float) -> List[float]:
     #print('\nreplace: prob = ' + str(prob))
     if prob == 1.0: 
         return [idx, d]
@@ -38,7 +39,7 @@ def replace(prob, i, idx, d):
         return [i, 0.0]
 
 
-def action(U, map, prob = 1.0, diagnostics = False):
+def action(U:List[List[float]], map:Dict[int,List[int]], prob:float = 1.0, diagnostics:bool = False) -> Dict[int,List[float]]:
 
     print('\n\n\n+++++++++++ variation +++++++++++++++++++++')
     print('U = ' + str(U))
@@ -140,6 +141,6 @@ if __name__ == "__main__":
                   [9,10,11,14],
                   [13,14,15,16]])
 
-    action(U, True)
+    action(U, {}, 1.0, True)
 else:
     print("variation module imported")                

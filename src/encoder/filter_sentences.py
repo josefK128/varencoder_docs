@@ -1,4 +1,5 @@
 # filter_sentences.py
+
 # obtains the docs dictionary from corpus2sentences.py
 # For each sentence in docs, filters out punctuation and stopwords,
 # tokenizes each sentence to a list of its words,
@@ -22,9 +23,11 @@ from nltk.stem.porter import PorterStemmer
 #parentdir = os.path.dirname(currentdir)
 #sys.path.insert(0,parentdir)       #include parent dir in sys.path - unneeded 
 import corpus2sentences as c2s
+from typing import Dict, List, Tuple
 
 
-def action(diagnostics=False):
+
+def action(diagnostics:bool=False) -> Tuple[Dict[int,List[str]], Dict[int,List[str]]] :
     if diagnostics == True:
         docs = c2s.action(True)
     else:
@@ -113,6 +116,7 @@ def action(diagnostics=False):
 
     return _docs, docs
    
+
 
 if __name__ == "__main__": 
     print("filter_sentences module running in diagnostics mode as __main__")

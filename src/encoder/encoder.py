@@ -11,9 +11,11 @@
 
 import numpy as np
 import sentences2matrix as s2m
+from typing import Tuple, List, Dict
 
 
-def action(diagnostics=False):
+
+def action(diagnostics:bool=False) -> Tuple[List[List[float]], Dict[int, List[str]]]:
     if diagnostics == True:
         A, docs = s2m.action(True)
     else:
@@ -26,8 +28,11 @@ def action(diagnostics=False):
     print('\n\n\n+++++++++++ encoder +++++++++++++++++++++')
     print('SVD - esp. sentence-feature (encoding semantic space) matrix U:')
     print('A = U*S*Vt where:')
+
+    # NOTE:mypy flags error - List[List[float]] does NOT have attr 'shape' 
+    # Numpy ndarrays are not correctly type annotated - so ignore error
     print('matrix2d.shape is given by (rows, columns)')
-    print('A.shape is ' + str(A.shape));
+    print('A.shape is ' + str(A.shape)); 
     print('U.shape is ' + str(U.shape));
     print('S.shape is ' + str(S.shape) + ' - diagonal of square matrix - non-diag els are zeroes');
     print('Vt.shape is ' + str(Vt.shape));

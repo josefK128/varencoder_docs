@@ -1,5 +1,5 @@
 # corpus2sentences.py
-# reads corpus and builds dictionary {doc-index:[doc-sentences],...} 
+# reads corpus and builds Dict[int,List[str]] - {doc-index:[doc-sentences],...} 
 # filters unnecessary and error-causing period expressions such as:
 # i.e, e.g, A. Taylor (A.)
 # returns dictionary docs to filter_sentences.py 
@@ -7,25 +7,27 @@
 
 import os
 import re
+from typing import Dict, List, Pattern
+
 
 
 #closure vars for action() - free vars in action()
 dbasepath = '../corpus/'  #location of corpus file(s) for diagnostics
 vbasepath = './corpus/'   #location of corpus file(s) for vae run
 corpusname = 'corpus0'    #default corpus0
-docs = {}                 #dictionary of documents from corpus
+docs:Dict[int,List[str]] = {}    #dictionary of documents from corpus
 
 
 
-def corpus(corpusnm = 'corpus0'):
+def corpus(corpusnm:str = 'corpus0') -> None:
     #identify corpusname as closure var, not local
     global corpusname
     corpusname = corpusnm
 
 
-def filter(regex, replace, s_pf, diagnostics=False):
+def filter(regex:Pattern, replace:str, s_pf:str, diagnostics:bool=False) -> str:
     #filter each text - eliminate i.e, e.g., A. Taylor
-    s = re.sub(regex, replace, s_pf)  #filter by regex
+    s:str = re.sub(regex, replace, s_pf)  #filter by regex
     result = re.subn(regex, replace, s_pf)  #filter by regex
 
     if diagnostics:
@@ -35,7 +37,7 @@ def filter(regex, replace, s_pf, diagnostics=False):
     return s
 
 
-def action(diagnostics=False):
+def action(diagnostics:bool=False) -> Dict[int, List[str]]:
     #relative location of corpus relative to main file 
     if diagnostics == True:
         basepath = dbasepath + corpusname +'/'   #relative to /encoder

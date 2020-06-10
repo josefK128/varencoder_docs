@@ -11,9 +11,10 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
 import filter_sentences as fs
+from typing import List,Dict,Tuple
 
 
-def action(diagnostics=False):
+def action(diagnostics:bool=False) -> Tuple[List[List[float]], Dict[int,List[str]]]:
     if diagnostics == True:
         _docs, docs = fs.action(True)
     else:
@@ -24,7 +25,7 @@ def action(diagnostics=False):
     print(_docs)
 
     #create dictionary of all sentences in all paragraphs for all _docs
-    sentences = {}
+    sentences:Dict[str, List[str]] = {}
     index = 0
     for paragraph in _docs.values():
         for sentence in paragraph:
@@ -37,7 +38,7 @@ def action(diagnostics=False):
 
 
     print('\n\n')
-    words = []
+    words:List[str] = []
     for k,v in sentences.items():
         #next line used if paragraphs are arrays of arrays of word-tokens
         #for w in v:
