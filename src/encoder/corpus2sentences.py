@@ -7,6 +7,7 @@
 
 import os
 import re
+#import msg2sentences
 from typing import Dict, List, Pattern
 
 
@@ -82,12 +83,19 @@ def action(diagnostics:bool=False) -> Dict[int, List[str]]:
 
                     for doc in a:
                         doc_sentences = []  #sentences associated with docs[doc] 
+
+                        # break doc into sentences - store in sentences str[]
+                        #sentences = msg2sentences.split_into_sentences(doc)
                         sentences = doc.split('.')  #sections of split doc string
+
                         if diagnostics: 
                             print('\n\ndoc ' + str(index))
                             print(str(len(sentences)-1) + ' sentences:')
                         for sentence in sentences:
+                            # strip whitespace
                             sentence = sentence.strip()
+                            print(f'sentence = {sentence}')
+
                             if(len(sentence) >0):   #skip empty sentences exp last
                                 if diagnostics: print(sentence +'\n')
                                 doc_sentences.append(sentence) #add non-empty sent.

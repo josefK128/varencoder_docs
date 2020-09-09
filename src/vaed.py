@@ -124,22 +124,46 @@ def action(diagnostics:bool=False) -> None:
     #docs_ files are timestamped by the 'epoch' time at their creation
     #these have a natural ordering in the corpusgen/<corpus_name> directory
     #docs.txt - constant so write only once - remove from dir to write fresh
-    docspath = basepath + corpusname + '/docs.txt'
-    if not path.exists(docspath):
-        with open(docspath, 'wt') as f:
-            print('\nwriting ' + docspath)
-#            for k,a in docs.items():
-#                docs[k] = '. '.join(a) + '. '
-#                #print('docs[' + str(k) + '] = ' + str(docs[k]) + '\n')
-            f.write(str(docs))
+
+    #create directory in corpusgen if needed
+    corpusgenpath = basepath + corpusname 
+    if not os.path.exists(corpusgenpath):
+        mode = 0o777
+        os.mkdir(corpusgenpath, mode)
+        #open(pdfgenpath, 'w').close()
+        print(f'created directory {corpusgenpath}')
+
+
+
+
+
+    #create docspath in corpusgen if needed
+    for key,txt in docs_.items():
+        docfname = 'doc' + str(key) + '.txt'
+        docspath = corpusgenpath + '/' + docfname
+        with open(docspath, 'w+') as f:
+            print(f'\n\nwriting doc{key}.txt to {docspath}')
+
+            # replace .. by . needed iff using msg2sentences in corpus2sentences
+            #txt = txt.replace('..', '.') 
+
+            # open file docfname in w mode - w+ => create if needed
+            #f = open(docfname, 'w+')  
+            print(f'txt = {txt}')
+            f.write(txt)
             f.close()
+
 
     #docs_<time>.txt
     # timestamped? - no
     #docs_path = basepath + corpusname + '/docs_' + str(time.time()) + '.json'
-    docs_path = basepath + corpusname + '/docs_.json'
-    with open(docs_path, 'wt') as f:
-        print('\nwriting generated docs_ as ' + docs_path)
+    docs_path = basepath + corpusname + '/json/'
+    if not path.exists(docs_path):
+        os.makedirs(docs_path)
+        print('\ncreated directory ' + docs_path)
+    docs_fname = docs_path + 'docs_.json'
+    with open(docs_fname, 'w+') as f:
+        print('\nwriting generated docs_ as ' + docs_fname)
 #        for k,a in docs_.items():
 #            docs_[k] = '. '.join(a) + '. '
 #            #print('docs_[' + str(k) + '] = ' + str(docs_[k]) + '\n')

@@ -1,4 +1,4 @@
-__README.md__
+__VAE_proto README.md__
 
 * install python 3.X (current latest 3.8.X) - see 
   https://www.python.org/downloads/ - simply click download button and follow defaults for installation
@@ -7,7 +7,7 @@ __README.md__
 
 * install dependencies - either in virtual environment  (see documentation python module venv) or else globally:
 
-  root> pip install requirements.txt                                
+  root> pip install -r requirements.txt                                
 
 * application usage:  cd src; src> py vae.py [corpus2 [.5]]
   where first argument is corpus-name (corpus 0,1,2,3). Corpus0 (default) is a toy corpus of two texts each with two sentences intended just to show readable diagnostics of most of the steps leading to new corpus generation. The corpuses are numbered from smallest (0) to largest (3). Argument two is a probability for sentence replacement in the generated corpus with default being 1.0 (all sentences replaced)  NOTE: for the most original generated corpus it is best to use probability = 1.0 (default)

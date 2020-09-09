@@ -1,4 +1,4 @@
-# parse.py: emails -> corpus
+# parse.py: email -> corpus
 
 import os
 import sys
@@ -6,34 +6,34 @@ import json
 from typing import List, Dict
 
 
-# determine thread
+# determine emails - directory-name of collection of json-emails
 if len(sys.argv) > 1:
-    thread = sys.argv[1]
+    emails = sys.argv[1]
 else:
-    thread = 'thread1'
-print('\nthread = ' + thread)
+    emails = 'emails1'
+print('\nemails = ' + emails)
 
 
 # vars
 data:Dict = {}
 msgs:str = "" 
-directory = '../email/' + thread
-directory_ = '../corpus/' + thread
-filename_ = thread + '.txt'
-filepath_ = os.path.join(directory_, filename_)
+emailpath = '../email/' + emails
+corpuspath = '../corpus/' + emails
+corpusname_ = emails + '.txt'
+corpuspath_ = os.path.join(corpuspath, corpusname_)
 
-# open target corpus-name
-fw = open(filepath_, 'w+')
+# open target corpus-name (create if needed +)
+fw = open(corpuspath_, 'w+')
 
 # diagnostics
-print('filepath_ = ' + filepath_)
+print('corpuspath_ = ' + corpuspath_)
 
 
 
-# parse files in thread
+# parse files in emails
 i = 0
-for filename in os.listdir(directory):
-    filepath = os.path.join(directory, filename)
+for filename in os.listdir(emailpath):
+    filepath = os.path.join(emailpath, filename)
     print('---------------------------------------------------')
     print('****** filepath = ' + filepath)
 
@@ -56,7 +56,7 @@ for filename in os.listdir(directory):
         
 
 
-# write msgs to filepath_
+# write msgs to corpuspath_
 fw.write(msgs)
 fw.close()
 

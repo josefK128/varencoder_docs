@@ -17,10 +17,19 @@ print('\ncorpus = ' + corpus)
 # vars
 data:Dict = {}
 msgs:str = "" 
-directory = '../corpusgen/' + corpus
-directory_ = '../emailgen/' + corpus
-filepath = directory + '/' + 'docs_.json'
-filepath_ = directory_ + '/'
+corpusgenpath = '../corpusgen/' + corpus
+emailgenpath = '../emailgen/' + corpus
+filepath = corpusgenpath + '/json/' + 'docs_.json'
+filepath_ = emailgenpath + '/'
+
+
+    
+#create directory in emailgen if needed
+if not os.path.exists(emailgenpath):
+    mode = 0o777
+    os.mkdir(emailgenpath, mode)
+    #open(pdfgenpath, 'w').close()
+    print(f'created directory {emailgenpath}')
 
 
 # parse json file to extract json-emails
